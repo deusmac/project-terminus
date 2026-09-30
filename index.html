@@ -1,0 +1,2161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TERMINUS · Limiting Heights Workbench</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%230b1320'/%3E%3Crect x='8' y='4' width='24' height='4' fill='%23dbe6f5'/%3E%3Crect x='14' y='8' width='12' height='22' fill='%23dbe6f5'/%3E%3Cpath d='M10 30 L30 30 L34 36 L6 36 Z' fill='%23dbe6f5'/%3E%3Crect x='4' y='17' width='32' height='3' fill='%23ff6b1a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TERMINUS — blueprint-industrial theme (dark + light)
+   ============================================================ */
+:root{
+  --ink:        #0b1320;
+  --ink-2:      #101b2e;
+  --ink-3:      #16243c;
+  --line:       #22344f;
+  --line-soft:  #1a2940;
+  --paper:      #dbe6f5;
+  --paper-dim:  #8da3c0;
+  --paper-faint:#5d7395;
+  --orange:     #ff6b1a;
+  --orange-soft:rgba(255,107,26,.14);
+  --green:      #3ddc97;
+  --green-soft: rgba(61,220,151,.12);
+  --red:        #ff4d5e;
+  --red-soft:   rgba(255,77,94,.12);
+  --amber:      #ffc53d;
+  --amber-soft: rgba(255,197,61,.12);
+  --blue:       #4da3ff;
+  --blue-soft:  rgba(77,163,255,.12);
+  --grid:       rgba(80,120,180,.05);
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --disp: 'Barlow Condensed', sans-serif;
+  --body: 'Barlow', sans-serif;
+}
+body.light{
+  --ink:        #eef2f8;
+  --ink-2:      #ffffff;
+  --ink-3:      #dde6f2;
+  --line:       #b9c8dd;
+  --line-soft:  #ccd8e8;
+  --paper:      #18253b;
+  --paper-dim:  #43597a;
+  --paper-faint:#7588a3;
+  --orange:     #e35200;
+  --orange-soft:rgba(227,82,0,.12);
+  --green:      #0d9e64;
+  --green-soft: rgba(13,158,100,.10);
+  --red:        #d92638;
+  --red-soft:   rgba(217,38,56,.08);
+  --amber:      #b07900;
+  --amber-soft: rgba(176,121,0,.10);
+  --blue:       #1565c9;
+  --blue-soft:  rgba(21,101,201,.10);
+  --grid:       rgba(60,100,160,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--body);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 23px, var(--grid) 23px 24px),
+    repeating-linear-gradient(90deg, transparent 0 23px, var(--grid) 23px 24px),
+    radial-gradient(1200px 700px at 75% -10%, var(--ink-3) 0%, var(--ink) 55%);
+  color:var(--paper);
+  min-height:100vh;
+  font-size:14px;
+  transition:background .25s, color .25s;
+}
+::selection{background:var(--orange);color:#fff}
+
+/* ---------- header ---------- */
+header{
+  display:flex;align-items:center;gap:18px;
+  padding:14px 26px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg, var(--ink-2), var(--ink));
+  position:sticky;top:0;z-index:50;
+}
+.logo-mark{width:38px;height:38px;flex:none}
+.logo-mark svg{width:100%;height:100%;display:block}
+h1{font-family:var(--disp);font-weight:800;font-size:26px;letter-spacing:.06em;text-transform:uppercase;line-height:1;}
+h1 small{display:block;font-size:11px;font-weight:600;color:var(--paper-faint);letter-spacing:.32em;margin-top:3px}
+h1 .o{color:var(--orange)}
+.header-meta{margin-left:auto;text-align:right;font-family:var(--mono);font-size:10.5px;color:var(--paper-faint);line-height:1.6}
+.header-meta b{color:var(--paper-dim)}
+.header-btns{display:flex;gap:8px;margin-left:18px}
+.hbtn{
+  font-family:var(--disp);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  padding:8px 13px;border-radius:3px;border:1px solid var(--line);background:var(--ink-2);
+  color:var(--paper-dim);cursor:pointer;transition:all .12s;
+}
+.hbtn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ---------- layout ---------- */
+.app{display:grid;grid-template-columns:330px minmax(0,1.35fr) minmax(0,1fr);min-height:calc(100vh - 67px);}
+@media (max-width:1280px){ .app{grid-template-columns:310px 1fr;} .doc-pane{grid-column:1/-1;border-left:none;border-top:1px solid var(--line)} }
+.pane{padding:20px 22px;overflow-y:auto}
+.input-pane{border-right:1px solid var(--line);background:var(--ink)}
+.doc-pane{border-left:1px solid var(--line);background:var(--ink)}
+.pane-label{
+  font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--paper-faint);
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;
+}
+.pane-label::after{content:"";flex:1;height:1px;background:var(--line)}
+.pane-label .tick{color:var(--orange);font-family:var(--mono);font-size:11px}
+
+/* ---------- input controls ---------- */
+.field{margin-bottom:20px}
+.field-name{
+  font-family:var(--disp);font-weight:600;font-size:14px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--paper-dim);margin-bottom:8px;
+  display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+}
+.field-name .val{font-family:var(--mono);font-size:12px;color:var(--orange);font-weight:700;letter-spacing:0;text-align:right}
+.field-name .qm{cursor:pointer;color:var(--paper-faint);font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.field-name .qm:hover{color:var(--orange);border-color:var(--orange)}
+.height-readout{font-family:var(--disp);font-weight:800;font-size:50px;line-height:1;color:var(--paper);display:flex;align-items:baseline;gap:6px;margin:2px 0 10px;}
+.height-readout .unit{font-size:19px;color:var(--paper-faint);font-weight:600}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;
+  background:linear-gradient(90deg,var(--orange) var(--fill,40%),var(--line) var(--fill,40%));
+  outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:20px;height:20px;background:var(--ink);
+  border:3px solid var(--orange);border-radius:2px;transform:rotate(45deg);
+  box-shadow:0 0 0 4px var(--orange-soft);transition:box-shadow .15s;
+}
+.slider-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;color:var(--paper-faint);margin-top:6px}
+.ft-in-inputs{display:flex;gap:8px;margin-top:10px}
+.ft-in-inputs label{flex:1;display:flex;align-items:center;gap:6px;background:var(--ink-2);border:1px solid var(--line);padding:6px 10px;border-radius:3px}
+.ft-in-inputs input{width:100%;background:none;border:none;color:var(--paper);font-family:var(--mono);font-size:15px;font-weight:700;outline:none;text-align:right}
+.ft-in-inputs span{font-family:var(--mono);font-size:10px;color:var(--paper-faint)}
+.seg{display:flex;border:1px solid var(--line);border-radius:3px;overflow:hidden;background:var(--ink-2);flex-wrap:wrap}
+.seg button{
+  flex:1 0 auto;padding:9px 6px;background:none;border:none;border-right:1px solid var(--line-soft);
+  color:var(--paper-dim);font-family:var(--mono);font-size:11px;font-weight:500;cursor:pointer;
+  transition:all .12s;
+}
+.seg button:last-child{border-right:none}
+.seg button:hover{color:var(--paper)}
+.seg button.on{background:var(--orange);color:#fff;font-weight:700}
+body.light .seg button.on{color:#fff}
+.switch-row{display:flex;align-items:center;justify-content:space-between;background:var(--ink-2);border:1px solid var(--line);border-radius:3px;padding:10px 12px;gap:10px}
+.switch-row .lbl{font-family:var(--mono);font-size:10.5px;color:var(--paper-dim)}
+.toggle{position:relative;width:42px;height:22px;background:var(--line);border-radius:2px;cursor:pointer;transition:background .15s;flex:none}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;background:var(--paper-dim);border-radius:1px;transition:all .15s}
+.toggle.on{background:var(--orange)}
+.toggle.on::after{left:23px;background:#fff}
+.wind-box{border:1px solid var(--blue);border-radius:3px;padding:12px;background:var(--blue-soft);margin-top:8px}
+.wind-box .wb-title{font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.14em;color:var(--blue);margin-bottom:8px}
+.wind-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.wind-row label{font-family:var(--mono);font-size:10px;color:var(--paper-dim);flex:none;width:78px}
+.wind-row input{flex:1;background:var(--ink);border:1px solid var(--line);border-radius:3px;color:var(--paper);font-family:var(--mono);font-size:13px;font-weight:700;padding:5px 8px;outline:none;text-align:right}
+.wind-row .seg{flex:1}
+.wind-out{font-family:var(--mono);font-size:10.5px;color:var(--paper-dim);line-height:1.7;margin:6px 0}
+.wind-out b{color:var(--blue);font-size:13px}
+.crit-summary{
+  margin-top:4px;border:1px dashed var(--line);border-radius:3px;padding:12px 14px;
+  font-family:var(--mono);font-size:10.5px;line-height:1.9;color:var(--paper-faint);
+}
+.crit-summary b{color:var(--paper);font-weight:500}
+.crit-summary .o{color:var(--orange)}
+
+/* ---------- matrix ---------- */
+.target-banner{
+  display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap;
+  border:1px solid var(--line);border-left:3px solid var(--orange);
+  background:linear-gradient(90deg, var(--orange-soft), transparent 60%);
+  padding:12px 16px;border-radius:3px;
+}
+.target-banner .tb-h{font-family:var(--disp);font-weight:800;font-size:30px;line-height:1}
+.target-banner .tb-meta{font-family:var(--mono);font-size:10px;color:var(--paper-dim);line-height:1.7;max-width:330px}
+.target-banner .tb-pick{margin-left:auto;text-align:right}
+.target-banner .pk-lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--paper-faint)}
+.target-banner .pk-val{font-family:var(--disp);font-weight:800;font-size:19px;color:var(--green)}
+.target-banner .pk-val.none{color:var(--red)}
+.mfr-block{margin-bottom:20px;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--ink-2)}
+.mfr-head{display:flex;align-items:baseline;gap:10px;padding:11px 16px;background:var(--ink-3);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.mfr-head h3{font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.07em;text-transform:uppercase}
+.mfr-head .fam{font-family:var(--mono);font-size:10px;color:var(--orange)}
+.mfr-head .esr{margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--paper-faint)}
+table.gauge-table{width:100%;border-collapse:collapse;font-family:var(--mono)}
+.gauge-table th{text-align:left;font-size:9px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--paper-faint);padding:8px 13px;border-bottom:1px solid var(--line-soft);}
+.gauge-table td{padding:9px 13px;border-bottom:1px solid var(--line-soft);font-size:12px;vertical-align:middle}
+.gauge-table tr:last-child td{border-bottom:none}
+.gauge-table tr.row{cursor:pointer;transition:background .1s}
+.gauge-table tr.row:hover{background:var(--orange-soft)}
+.gauge-table tr.row.selected{background:var(--orange-soft);box-shadow:inset 3px 0 0 var(--orange)}
+.gauge-table .desig{color:var(--paper);font-weight:700}
+.gauge-table .ga{color:var(--paper-dim);font-size:10.5px}
+.gauge-table .ht{font-weight:700;font-size:13px}
+.gauge-table .gov{font-size:9px;color:var(--paper-faint)}
+.chip{display:inline-block;padding:3px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:.09em;font-family:var(--mono)}
+.chip.pass{background:var(--green-soft);color:var(--green);border:1px solid var(--green)}
+.chip.fail{background:var(--red-soft);color:var(--red);border:1px solid var(--red)}
+.chip.pick{background:var(--orange);color:#fff;border:1px solid var(--orange)}
+.chip.eq{background:var(--blue-soft);color:var(--blue);border:1px solid var(--blue)}
+.chip.ver{background:var(--green-soft);color:var(--green);border:1px solid var(--green)}
+.chip.est{background:var(--amber-soft);color:var(--amber);border:1px solid var(--amber)}
+.margin-bar{position:relative;height:5px;background:var(--line-soft);border-radius:2px;width:80px;overflow:hidden}
+.margin-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:2px}
+.avail-strip{font-family:var(--mono);font-size:9.5px;color:var(--paper-faint);padding:8px 16px;border-top:1px dashed var(--line-soft);line-height:1.8}
+.avail-strip b{color:var(--paper-dim)}
+
+/* quick compare */
+.qc-block{margin-bottom:20px;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--ink-2)}
+.qc-head{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--ink-3);border-bottom:1px solid var(--line);cursor:pointer}
+.qc-head h3{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.12em;text-transform:uppercase}
+.qc-head .arr{margin-left:auto;font-family:var(--mono);color:var(--paper-faint);transition:transform .2s}
+.qc-block.open .arr{transform:rotate(90deg)}
+.qc-body{display:none;padding:4px 0}
+.qc-block.open .qc-body{display:block}
+table.qc-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10.5px}
+.qc-table th{font-size:9px;letter-spacing:.1em;color:var(--paper-faint);padding:7px 12px;border-bottom:1px solid var(--line-soft);text-align:center;font-weight:500}
+.qc-table th:first-child,.qc-table td:first-child{text-align:left}
+.qc-table td{padding:8px 12px;border-bottom:1px solid var(--line-soft);text-align:center}
+.qc-table tr:last-child td{border-bottom:none}
+.qc-table .dep{font-weight:700;color:var(--paper)}
+.qc-table .hit{color:var(--green);font-weight:700}
+.qc-table .hit small{display:block;font-weight:400;font-size:9px;color:var(--paper-faint)}
+.qc-table .miss{color:var(--red)}
+.qc-table td.cur{outline:1px solid var(--orange);outline-offset:-3px;background:var(--orange-soft)}
+
+/* ---------- document viewer ---------- */
+.doc-empty{border:1px dashed var(--line);border-radius:4px;padding:40px 24px;text-align:center;color:var(--paper-faint);font-family:var(--mono);font-size:11px;line-height:2}
+.doc-card{border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--ink-2);animation:docIn .25s ease}
+@keyframes docIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.doc-head{padding:14px 18px;background:var(--ink-3);border-bottom:1px solid var(--line)}
+.doc-head .src-tag{font-family:var(--mono);font-size:9px;letter-spacing:.26em;color:var(--orange);margin-bottom:6px}
+.doc-head h4{font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:.04em}
+.doc-head .sub{font-family:var(--mono);font-size:10px;color:var(--paper-dim);margin-top:4px;line-height:1.6}
+.doc-links{display:flex;gap:8px;padding:10px 18px;border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+.doc-links a{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-decoration:none;
+  color:var(--blue);border:1px solid var(--blue);border-radius:2px;padding:5px 9px;transition:all .12s;
+}
+.doc-links a:hover{background:var(--blue-soft)}
+.doc-meta{padding:14px 18px;border-bottom:1px solid var(--line-soft)}
+.doc-meta dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-family:var(--mono);font-size:10.5px}
+.doc-meta dt{color:var(--paper-faint);letter-spacing:.05em}
+.doc-meta dd{color:var(--paper)}
+.doc-meta dd.o{color:var(--orange);font-weight:700}
+.facsimile{padding:16px 18px}
+.fac-frame{background:#e9eef6;color:#1b2434;border-radius:2px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);font-family:var(--mono);position:relative;}
+.fac-frame::after{content:"GENERATED FACSIMILE — VERIFY AGAINST LINKED SOURCE";position:absolute;right:10px;bottom:7px;font-size:7.5px;letter-spacing:.16em;color:#9aa7bb;}
+.fac-title{font-family:var(--disp);font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#13203a}
+.fac-sub{font-size:9px;margin:2px 0 10px;color:#5b6980}
+.fac-table{width:100%;border-collapse:collapse;font-size:10px}
+.fac-table th{background:#13203a;color:#e9eef6;padding:5px 5px;font-weight:500;font-size:8.5px;letter-spacing:.05em}
+.fac-table td{border:1px solid #c2cddd;padding:5px 5px;text-align:center;color:#27344c}
+.fac-table td.mem{text-align:left;font-weight:700;color:#13203a;background:#dde5f0;font-size:9px}
+.fac-table td.hl{background:#ff6b1a;color:#fff;font-weight:700;outline:2px solid #c24c08;outline-offset:-2px}
+.fac-note{font-size:8.5px;color:#7c8aa3;margin-top:8px;line-height:1.6}
+.audit-trail{padding:14px 18px;border-top:1px solid var(--line-soft)}
+.audit-trail .at-step{display:flex;gap:10px;font-family:var(--mono);font-size:10px;color:var(--paper-dim);line-height:1.7;margin-bottom:8px}
+.audit-trail .at-step:last-child{margin-bottom:0}
+.audit-trail .n{color:var(--orange);font-weight:700;flex:none}
+.audit-trail b{color:var(--paper);font-weight:500}
+
+/* ---------- AI assistant ---------- */
+.ai-box{margin-top:24px;border:1px solid var(--line);border-radius:4px;background:var(--ink-2);overflow:hidden}
+.ai-head{display:flex;align-items:center;gap:9px;padding:11px 14px;background:var(--ink-3);border-bottom:1px solid var(--line)}
+.ai-dot{width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:pulse 2.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.ai-head h3{font-family:var(--disp);font-weight:700;font-size:14px;letter-spacing:.18em;text-transform:uppercase}
+.ai-body{padding:13px 14px}
+.ai-body textarea{
+  width:100%;min-height:92px;background:var(--ink);border:1px solid var(--line);border-radius:3px;
+  color:var(--paper);font-family:var(--mono);font-size:11px;line-height:1.7;padding:10px;resize:vertical;outline:none;
+}
+.ai-body textarea:focus{border-color:var(--orange)}
+.ai-actions{display:flex;gap:8px;margin-top:10px}
+.btn{
+  font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+  padding:9px 16px;border-radius:3px;border:1px solid var(--orange);cursor:pointer;transition:all .12s;
+}
+.btn.primary{background:var(--orange);color:#fff}
+.btn.primary:hover{filter:brightness(1.12)}
+.btn.ghost{background:none;color:var(--orange)}
+.btn.ghost:hover{background:var(--orange-soft)}
+.ai-report{margin-top:13px;display:none}
+.ai-report.show{display:block;animation:docIn .25s ease}
+.ai-finding{display:flex;gap:9px;font-family:var(--mono);font-size:10.5px;line-height:1.65;padding:8px 10px;border-radius:3px;margin-bottom:7px;border:1px solid var(--line-soft);background:var(--ink)}
+.ai-finding .ic{flex:none;font-weight:700}
+.ai-finding.ok .ic{color:var(--green)} .ai-finding.ok{border-color:var(--green)}
+.ai-finding.warn .ic{color:var(--amber)} .ai-finding.warn{border-color:var(--amber)}
+.ai-finding.bad .ic{color:var(--red)} .ai-finding.bad{border-color:var(--red)}
+.ai-finding.info .ic{color:var(--paper-dim)}
+.ai-finding b{color:var(--paper);font-weight:500}
+
+/* ---------- modals ---------- */
+.modal-veil{position:fixed;inset:0;background:rgba(5,10,18,.72);z-index:100;display:none;align-items:flex-start;justify-content:center;padding:5vh 20px;overflow-y:auto}
+.modal-veil.show{display:flex}
+.modal{background:var(--ink-2);border:1px solid var(--line);border-radius:5px;max-width:780px;width:100%;animation:docIn .2s ease}
+.modal-head{display:flex;align-items:center;padding:14px 20px;background:var(--ink-3);border-bottom:1px solid var(--line)}
+.modal-head h2{font-family:var(--disp);font-weight:800;font-size:20px;letter-spacing:.1em;text-transform:uppercase}
+.modal-head button{margin-left:auto;background:none;border:1px solid var(--line);border-radius:3px;color:var(--paper-dim);font-family:var(--mono);padding:5px 11px;cursor:pointer}
+.modal-head button:hover{color:var(--orange);border-color:var(--orange)}
+.modal-body{padding:18px 20px;max-height:74vh;overflow-y:auto}
+.guide-sec{margin-bottom:20px}
+.guide-sec h3{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin-bottom:7px}
+.guide-sec p, .guide-sec li{font-size:13px;line-height:1.7;color:var(--paper-dim);margin-bottom:6px}
+.guide-sec b{color:var(--paper)}
+.guide-sec ul{padding-left:18px}
+.guide-sec table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;margin:8px 0}
+.guide-sec th{text-align:left;color:var(--paper-faint);font-weight:500;font-size:9.5px;letter-spacing:.1em;padding:6px 8px;border-bottom:1px solid var(--line)}
+.guide-sec td{padding:6px 8px;border-bottom:1px solid var(--line-soft);color:var(--paper-dim)}
+.guide-sec td:first-child{color:var(--paper);font-weight:700}
+.src-item{border:1px solid var(--line);border-radius:3px;padding:12px 14px;margin-bottom:10px;background:var(--ink)}
+.src-item h4{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.06em;margin-bottom:3px}
+.src-item .meta{font-family:var(--mono);font-size:10px;color:var(--paper-faint);line-height:1.7;margin-bottom:7px}
+.src-item .doc-links{padding:0;border:none}
+
+footer{padding:14px 26px;border-top:1px solid var(--line);font-family:var(--mono);font-size:9.5px;color:var(--paper-faint);line-height:1.8;background:var(--ink);}
+footer b{color:var(--paper-dim)}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">
+    <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <rect x="8" y="4" width="24" height="4" fill="var(--paper)"/>
+      <rect x="14" y="8" width="12" height="22" fill="var(--paper)"/>
+      <path d="M10 30 L30 30 L34 36 L6 36 Z" fill="var(--paper)"/>
+      <rect x="4" y="17" width="32" height="3" fill="var(--orange)"/>
+    </svg>
+  </div>
+  <h1>Terminus <span class="o">/</span> Limiting Heights
+    <small>METAL STUD FRAMING · ESTIMATOR WORKBENCH</small>
+  </h1>
+  <div class="header-meta">
+    <div><b>ENGINE</b> AISI S100 · VALIDATED VS SSMA TABLES</div>
+    <div><b>DATASET</b> <span id="dbStamp">—</span></div>
+  </div>
+  <div class="header-btns">
+    <button class="hbtn" id="btnGuide">Field Guide</button>
+    <button class="hbtn" id="btnSources">Sources</button>
+    <button class="hbtn" id="btnValidate">✓ Validate</button>
+    <button class="hbtn" id="btnTheme">◐ Theme</button>
+  </div>
+</header>
+
+<div class="app">
+
+  <!-- ============ INPUT PANEL ============ -->
+  <aside class="pane input-pane">
+    <div class="pane-label"><span class="tick">01</span> Project Spec</div>
+
+    <div class="field">
+      <div class="field-name">Wall Type <span class="qm" data-g="walltype">?</span><span class="val" id="wallVal">INTERIOR</span></div>
+      <div class="seg" id="wallSeg"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-name" id="targetLabel">Target Wall Height</div>
+      <div class="height-readout"><span id="hrFt">14</span><span class="unit">FT</span><span id="hrIn">0</span><span class="unit">IN</span></div>
+      <input type="range" id="heightSlider" min="96" max="480" step="1" value="168">
+      <div class="slider-scale"><span>8'</span><span>16'</span><span>24'</span><span>32'</span><span>40'</span></div>
+      <div class="ft-in-inputs">
+        <label><input type="number" id="ftInput" min="8" max="40" value="14"><span>FT</span></label>
+        <label><input type="number" id="inInput" min="0" max="11" value="0"><span>IN</span></label>
+      </div>
+    </div>
+
+    <div class="field" id="ceilAppRow" style="display:none">
+      <div class="field-name">Ceiling Location <span class="val" id="ceilAppVal">INTERIOR</span></div>
+      <div class="seg" id="ceilAppSeg"></div>
+    </div>
+
+    <div class="field" id="ceilSysRow" style="display:none">
+      <div class="field-name">Framing System <span class="qm" data-g="ceiling">?</span><span class="val" id="ceilSysVal">S-JOIST</span></div>
+      <div class="seg" id="ceilSysSeg"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-name"><span id="depthLabel">Stud Size (Web)</span> <span class="qm" data-g="deepstud">?</span><span class="val" id="depthVal">3-5/8"</span></div>
+      <div class="seg" id="depthSeg"></div>
+    </div>
+
+    <div class="field" id="flangeRow">
+      <div class="field-name">Flange Size <span class="qm" data-g="flange">?</span><span class="val" id="flangeVal">1-5/8"</span></div>
+      <div class="seg" id="flangeSeg"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-name"><span id="spacingLabel">Stud Spacing</span> <span class="val" id="spacingVal">16" OC</span></div>
+      <div class="seg" id="spacingSeg"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Lateral Load <span class="qm" data-g="psf">?</span><span class="val" id="loadVal">5 PSF</span></div>
+      <div class="seg" id="loadSeg"></div>
+      <div class="wind-box" id="windBox" style="display:none">
+        <div class="wb-title">⌁ WIND PRESSURE CALCULATOR</div>
+        <div class="wind-row"><label>WIND SPEED</label><input type="number" id="windV" inputmode="numeric" value="115"><span style="font-family:var(--mono);font-size:10px;color:var(--paper-faint)">MPH</span></div>
+        <div class="wind-row"><label>EXPOSURE</label><div class="seg" id="windExpSeg"></div></div>
+        <div class="wind-out" id="windOut"></div>
+        <button class="btn primary" id="windApply" style="width:100%;font-size:12px;padding:7px">Apply as Design Load</button>
+      </div>
+    </div>
+
+    <div class="field" id="finishRow" style="display:none">
+      <div class="field-name">Exterior Finish <span class="qm" data-g="finish">?</span><span class="val" id="finishVal">—</span></div>
+      <div class="seg" id="finishSeg"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Deflection Limit <span class="qm" data-g="defl">?</span><span class="val" id="deflVal">L/240</span></div>
+      <div class="seg" id="deflSeg"></div>
+    </div>
+
+    <div class="field" id="ceilBraceRow" style="display:none">
+      <div class="field-name"><span id="ceilBraceLabel">Compression Flange</span> <span class="val" id="ceilBraceVal">UNBRACED</span></div>
+      <div class="seg" id="ceilBraceSeg"></div>
+    </div>
+
+    <div class="field" id="compRow">
+      <div class="switch-row">
+        <span class="lbl">COMPOSITE ASSEMBLY (GYP BOTH SIDES)</span>
+        <div class="toggle" id="compToggle"></div>
+      </div>
+    </div>
+
+    <div class="field" id="windRedRow" style="display:none">
+      <div class="switch-row">
+        <span class="lbl">0.70 × WIND FOR DEFLECTION (IBC 1604.3)</span>
+        <div class="toggle on" id="windRedToggle"></div>
+      </div>
+    </div>
+
+    <div class="crit-summary" id="critSummary"></div>
+  </aside>
+
+  <!-- ============ MATRIX PANEL ============ -->
+  <main class="pane matrix-pane">
+    <div class="pane-label"><span class="tick">02</span> Live Selection Matrix</div>
+    <div class="target-banner" id="targetBanner"></div>
+
+    <div class="qc-block" id="qcBlock">
+      <div class="qc-head" id="qcHead"><h3>⇄ Quick Compare — Depth × Spacing</h3><span class="arr">▶</span></div>
+      <div class="qc-body" id="qcBody"></div>
+    </div>
+
+    <div id="matrix"></div>
+
+    <!-- AI ASSISTANT -->
+    <div class="ai-box">
+      <div class="ai-head"><div class="ai-dot"></div><h3>AI Estimator Assistant</h3></div>
+      <div class="ai-body">
+        <textarea id="aiInput" placeholder='Paste raw structural notes, e.g. — "Exterior walls: 6&quot; 16ga studs w/ 1-5/8&quot; flange at 16&quot; OC to 24&apos;-0&quot;. Brick veneer. 115 mph wind, Exposure C, deflection L/600."'></textarea>
+        <div class="ai-actions">
+          <button class="btn primary" id="aiAnalyze">Analyze Spec</button>
+          <button class="btn ghost" id="aiSample">Load Sample Note</button>
+        </div>
+        <div class="ai-report" id="aiReport"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ DOCUMENT PANEL ============ -->
+  <aside class="pane doc-pane">
+    <div class="pane-label"><span class="tick">03</span> Source Document Reference</div>
+    <div id="docViewer"></div>
+  </aside>
+</div>
+
+<!-- FIELD GUIDE MODAL -->
+<div class="modal-veil" id="guideVeil">
+  <div class="modal">
+    <div class="modal-head"><h2>Estimator's Field Guide</h2><button data-close="guideVeil">✕ CLOSE</button></div>
+    <div class="modal-body" id="guideBody"></div>
+  </div>
+</div>
+
+<!-- VALIDATION MODAL -->
+<div class="modal-veil" id="valVeil">
+  <div class="modal">
+    <div class="modal-head"><h2>Engine Validation vs SSMA</h2><button data-close="valVeil">✕ CLOSE</button></div>
+    <div class="modal-body" id="valBody"></div>
+  </div>
+</div>
+
+<!-- SOURCES MODAL -->
+<div class="modal-veil" id="srcVeil">
+  <div class="modal">
+    <div class="modal-head"><h2>Data Sources & Verification</h2><button data-close="srcVeil">✕ CLOSE</button></div>
+    <div class="modal-body" id="srcBody"></div>
+  </div>
+</div>
+
+<footer>
+  <b>ENGINEERING BASIS:</b> Heights computed live from SSMA-published effective section properties (I<sub>xe</sub>, M<sub>a</sub>, E = 29,500 ksi) per AISI S100 — deflection: L = (384·E·I<sub>xe</sub> / 5·w·n)<sup>1/3</sup>; flexure: L = (8·M<sub>a</sub> / w)<sup>1/2</sup>; lesser governs. Engine output validated against published SSMA / Steel-Con limiting-height tables (exact match incl. the 0.70 wind-deflection provision).
+  <b>CEILING / SOFFIT SPANS:</b> not computed — read directly from the SSMA published span tables (S-section joists pp.62–67, hat furring channel p.68, U-channel p.69). Loads are total load acting up or down on the ceiling; a cell SSMA does not publish reads N/R rather than being interpolated.
+  <b>DISCLAIMER:</b> A bidding study tool — not a substitute for the EOR. Rows marked VERIFIED carry SSMA-published properties; rows marked ESTIMATE (proprietary EQ lines) must be confirmed against the linked manufacturer catalog and ICC-ES report before submittal. Rows marked CALC (10" and 12" webs, and 2-1/2" and 3" flanges) have SSMA section properties but no SSMA-published height table — the height is this engine's own, so confirm with the EOR before it goes in front of a GC.
+</footer>
+
+<script>
+/* ================================================================
+   1. DATA LAYER — verified SSMA section properties
+   ----------------------------------------------------------------
+   Source: SSMA Product Technical Guide (pp. 7–12), saved locally at
+   sources/SSMA_Product_Technical_Guide.pdf, cross-checked against
+   Steel-Con submittal sources/SteelCon_362S162-43_Submittal.pdf.
+   Values: [Ix (in⁴, GROSS — this is what the SSMA limiting-height
+   tables use for deflection; verified by exact reproduction of the
+   Curtain Wall tables incl. deep 800 sections), Ma (lb·in, lesser of
+   Mal/Mad — strength)]. Structural 54/68/97 mil rows use the 50 ksi
+   listing (standard supply); 33/43 mil are 33 ksi.
+   Structural studs are SSMA-standardized: section properties are
+   IDENTICAL across all member manufacturers. Proprietary EQ drywall
+   lines are flagged est:true and must be verified per catalog.
+   ================================================================ */
+const SSMA_STRUCTURAL = { // depth: { flange: { mil: [Ix_gross, Ma, Fy] } }
+  "250": {
+    "137": {33:[.203,3100,33], 43:[.261,4530,33], 54:[.318,8220,50], 68:[.386,10650,50], 97:[.506,14750,50]},
+    "162": {33:[.235,3550,33], 43:[.302,5220,33], 54:[.370,9420,50], 68:[.450,12110,50], 97:[.596,16930,50]},
+    "200": {33:[.279,3900,33], 43:[.358,5490,33], 54:[.440,9600,50], 68:[.537,13840,50], 97:[.718,19820,50]},
+    "250": {43:[.426,5870,33], 54:[.524,10220,50], 68:[.643,13350,50], 97:[.864,22310,50]},
+  },
+  "362": {
+    "137": {33:[.479,4590,33], 43:[.616,6320,33], 54:[.756,11420,50], 68:[.922,14770,50], 97:[1.229,24100,50]},
+    "162": {33:[.551,5290,33], 43:[.710,7340,33], 54:[.873,13280,50], 68:[1.069,17180,50], 97:[1.435,27520,50]},
+    "200": {33:[.648,5810,33], 43:[.836,8430,33], 54:[1.030,14660,50], 68:[1.265,19950,50], 97:[1.711,32030,50]},
+    "250": {43:[.980,8880,33], 54:[1.210,15400,50], 68:[1.490,20630,50], 97:[2.027,35170,50]},
+    "300": {54:[1.390,15830,50], 68:[1.716,21440,50], 97:[2.343,34420,50]},
+  },
+  "400": {
+    "137": {33:[.603,5120,33], 43:[.776,7090,33], 54:[.953,12820,50], 68:[1.165,16700,50], 97:[1.557,27810,50]},
+    "162": {33:[.692,5910,33], 43:[.892,8230,33], 54:[1.098,14900,50], 68:[1.346,19410,50], 97:[1.812,31640,50]},
+    "200": {33:[.812,6490,33], 43:[1.047,9450,33], 54:[1.292,16430,50], 68:[1.589,22480,50], 97:[2.155,36680,50]},
+    "250": {43:[1.224,9930,33], 54:[1.512,17240,50], 68:[1.864,23190,50], 97:[2.541,40060,50]},
+    "300": {54:[1.732,17720,50], 68:[2.139,24090,50], 97:[2.928,39120,50]},
+  },
+  "600": {
+    "137": {33:[1.582,8190,33], 43:[2.042,11820,33], 54:[2.518,21240,50], 68:[3.094,28890,50], 97:[4.188,50800,50]},
+    "162": {33:[1.793,9470,33], 43:[2.316,14460,33], 54:[2.860,25900,50], 68:[3.525,35690,50], 97:[4.797,56720,50]},
+    "200": {33:[2.075,10770,33], 43:[2.683,15390,33], 54:[3.319,27380,50], 68:[4.101,39690,50], 97:[5.612,63670,50]},
+    "250": {43:[3.082,16210,33], 54:[3.819,28710,50], 68:[4.727,39070,50], 97:[6.496,66810,50], 118:[7.713,85920,50]},
+    "300": {54:[4.319,29620,50], 68:[5.354,40530,50], 97:[7.381,64670,50], 118:[8.785,90370,50]},
+  },
+  "800": {
+    "137": {33:[3.198,10710,33], 43:[4.134,15780,33], 54:[5.110,28470,50], 68:[6.303,39570,50], 97:[8.597,63910,50]},
+    "162": {33:[3.582,12610,33], 43:[4.633,18330,33], 54:[5.736,32810,50], 68:[7.089,45110,50], 97:[9.713,71930,50]},
+    "200": {33:[4.096,14520,33], 43:[5.302,20990,33], 54:[6.573,37370,50], 68:[8.140,54700,50], 97:[11.203,89760,50]},
+    "250": {43:[6.015,22060,33], 54:[7.465,39130,50], 68:[9.261,53750,50], 97:[12.789,93420,50], 118:[15.242,122920,50]},
+    "300": {54:[8.358,40220,50], 68:[10.382,55470,50], 97:[14.375,89890,50], 118:[17.167,126690,50]},
+  },
+  /* 10" and 12" webs, SSMA Product Technical Guide pp.12-13. SSMA publishes
+     section properties for these but NO curtain wall limiting height table
+     (those stop at 800S200-118, p.27) and no ceiling/soffit span table.
+     Wall heights at these depths are engine-computed, flagged calc:true. */
+  "1000": {
+    "162": {43:[8.025,22490,33], 54:[9.95,40370,50], 68:[12.325,56350,50], 97:[16.967,92560,50], 118:[20.169,120340,50]},
+    "200": {43:[9.085,26140,33], 54:[11.278,46620,50], 68:[13.994,64500,50], 97:[19.336,104730,50], 118:[23.052,135740,50]},
+    "250": {43:[10.203,27670,33], 54:[12.677,49160,50], 68:[15.751,68130,50], 97:[21.827,120130,50], 118:[26.08,159800,50]},
+    "300": {54:[14.076,50690,50], 68:[17.509,70400,50], 97:[24.318,115620,50], 118:[29.109,164190,50]},
+  },
+  "1200": {
+    "162": {54:[15.73,46750,50], 68:[19.518,66140,50], 97:[26.966,111300,50], 118:[32.145,147230,50]},
+    "200": {54:[17.662,54740,50], 68:[21.947,76550,50], 97:[30.417,126860,50], 118:[36.347,166800,50]},
+    "250": {54:[19.681,58390,50], 68:[24.484,81590,50], 97:[34.016,135370,50], 118:[40.726,178570,50]},
+    "300": {54:[21.699,60650,50], 68:[27.02,84790,50], 97:[37.616,141050,50], 118:[45.106,201680,50]},
+  },
+};
+/* Sections whose web height-to-thickness ratio exceeds 200 (guide footnote 1):
+   web stiffeners are required at all support points and concentrated loads.
+   That is a real cost item on a bid, so it is surfaced as a row chip. */
+const WEB_STIFFENER_REQ = new Set([
+  "1000S162-43","1000S200-43","1000S250-43","1200S162-54","1200S200-54","1200S250-54","1200S300-54",
+]);
+/* Depths SSMA gives section properties for but does NOT tabulate in any
+   published wall height table. Heights at these depths come from the engine. */
+const CALC_ONLY_DEPTHS = new Set(["1000","1200"]);
+/* Flanges SSMA gives section properties for (2-1/2" and 3") but does NOT carry in
+   any wall limiting height table: the Curtain Wall tables cover S137/S162/S200 only.
+   Heights for these flanges also come from the engine, never the plain SSMA chip. */
+const CALC_ONLY_FLANGES = new Set(["250","300"]);
+const isCalcOnly = (depth, flange) => CALC_ONLY_DEPTHS.has(depth) || CALC_ONLY_FLANGES.has(flange);
+const SSMA_NONSTRUCTURAL = { // S125 drywall studs (1-1/4" flange, Fy 33 ksi): { depth: { mil: [Ixe, Ma] } }
+  "250": {18:[.089,1030], 27:[.144,1830], 30:[.159,2090], 33:[.175,2410], 43:[.225,3430], 54:[.277,4980], 68:[.334,6300]},
+  "362": {18:[.221,1480], 27:[.342,2670], 30:[.376,3080], 33:[.415,3590], 43:[.537,5310], 54:[.661,6780], 68:[.802,8510]},
+  "400": {18:[.281,1640], 27:[.431,2970], 30:[.474,3440], 33:[.524,4010], 43:[.680,5960], 54:[.835,7650], 68:[1.015,9720]},
+  "600": {27:[1.097,4630], 30:[1.218,5390], 33:[1.361,6320], 43:[1.807,9460], 54:[2.236,13180], 68:[2.735,20650]},
+  "800": {33:[2.656,8220], 43:[3.581,12560], 54:[4.566,17870], 68:[5.644,25210]},
+};
+/* Members SSMA rates ONLY in composite walls (gyp both sides). 600S125-18 has no
+   non-composite properties (guide p.7, note 3: web h/t > 260) but the guide's
+   "Interior Wall Heights — Composite" table (p.20) publishes these heights.
+   table: { spacing: { psf: [L/120, L/240, L/360] inches, null = not rated } } */
+const COMPOSITE_ONLY = {
+  "600": [{
+    desig:"600S125-18", depth:"600", flange:"125", mil:18, fy:33, ix:0.778, ma:0,
+    ga:"25ga", verified:true, compOnly:true,
+    table:{ "12":{ "5":[278,273,239], "7.5":[227,227,209], "10":[196,196,190] },
+            "16":{ "5":[241,241,217], "7.5":[196,196,190], "10":[170,170,170] },
+            "24":{ "5":[196,196,190], "7.5":[160,160,160], "10":[null,null,null] } }
+  }],
+};
+/* Proprietary high-strength EQ drywall lines — ESTIMATES calibrated to the one
+   verified public anchor (ProSTUD 25 @ 5psf/16"oc/L240 = 12'-4") and catalog
+   patterns. Flagged in the UI; verify in the linked catalogs before bidding. */
+const EQ_LINES = [
+  { famId:"cd-prostud", mfr:"ClarkDietrich", name:"ProSTUD® EQ Drywall Framing", esr:"ICC-ES ESR-3064P",
+    web:"https://www.clarkdietrich.com/sites/default/files/media/documents/CD_ProSTUD_Catalog.pdf",
+    web2:{label:"INTERACTIVE TABLES (iTOOLS)", url:"https://www.itools.clarkdietrich.com/prostud_limiting_heights.php"},
+    anchor:'Verified anchor: 362PDS125-15 @ 5 psf / 16" OC / L/240 = 12\'-4" (matches published value)',
+    code:"PDS",
+    members:{ "250":{15:[.085,1450,57],18:[.101,2150,70]}, "362":{15:[.191,2050,57],18:[.228,3100,70]},
+              "400":{15:[.240,2300,57],18:[.285,3450,70]}, "600":{15:[.500,2900,57],18:[.600,4400,70]} } },
+  { famId:"cemco-viper", mfr:"CEMCO", name:"ViperStud® EQ Drywall Framing", esr:"ICC-ES ESR-2620",
+    web:"https://cemcosteel.com/app/uploads/2020/04/ViperStud-Catalog.pdf",
+    web2:{label:"ICC-ES ESR-2620 (PDF)", url:"https://cemcosteel.com/app/uploads/2020/04/ICC-ESR-2620_ViperStud_unlocked.pdf"},
+    anchor:"Catalog: 15 mil (57 ksi) Viper25 · 18 mil (70 ksi) Viper20EQ",
+    code:"VS",
+    members:{ "250":{15:[.083,1400,57],18:[.099,2100,70]}, "362":{15:[.186,2000,57],18:[.222,3050,70]},
+              "400":{15:[.234,2250,57],18:[.279,3400,70]}, "600":{15:[.490,2850,57],18:[.590,4300,70]} } },
+  { famId:"mw-viper", mfr:"Marino\\WARE", name:"ViperStud® EQ Drywall Framing", esr:"ICC-ES ESR-2620",
+    web:"https://www.marinoware.com/products/viperstud/",
+    anchor:"Same ESR-2620 product family as CEMCO (sister companies)",
+    code:"VS",
+    members:{ "250":{15:[.083,1400,57],18:[.099,2100,70]}, "362":{15:[.186,2000,57],18:[.222,3050,70]},
+              "400":{15:[.234,2250,57],18:[.279,3400,70]}, "600":{15:[.490,2850,57],18:[.590,4300,70]} } },
+  { famId:"ti-true", mfr:"Telling Industries", name:"TRUE-STUD™ EQ Drywall Framing", esr:"ICC-ES (see catalog)",
+    web:"https://tellingindustries.com",
+    anchor:"TRUE-STUD™ re-engineered drywall framing system — verify tiers & heights in Telling literature",
+    code:"TS",
+    members:{ "250":{15:[.084,1420,57],18:[.100,2120,70]}, "362":{15:[.188,2010,57],18:[.224,3060,70]},
+              "400":{15:[.236,2260,57],18:[.281,3410,70]}, "600":{15:[.495,2860,57],18:[.595,4320,70]} } },
+];
+/* ================================================================
+   SSMA CEILING / SOFFIT SPANS - published tables, transcribed from
+   sources/SSMA_Product_Technical_Guide.pdf by direct text extraction
+   (no hand typing): S-sections pp.62-63 interior, pp.64-67 exterior;
+   hat furring F-sections p.68; U-channel p.69.
+   S row  {f:Fy, v:[18 spans, inches], e:"flags"} - per published load
+   ascending: unbraced 12/16/24 then midspan-braced 12/16/24.
+   F/U row [spans] - the single-span run first, then multiple-span.
+   "e" flag = web stiffeners required at end reactions (p.61 note 4).
+   ================================================================ */
+const CEILING_S_INT240 = {
+  "162S125-18":{f:33,v:[87,79,70,102,92,79,77,70,61,88,79,69,60,53,45,67,58,47]},
+  "162S125-27":{f:33,v:[103,95,85,116,106,92,92,85,75,102,92,80,73,66,57,78,71,62]},
+  "162S125-30":{f:33,v:[108,99,88,120,109,95,96,88,79,105,95,83,77,70,60,81,73,64]},
+  "162S125-33":{f:33,v:[114,104,92,124,113,98,100,92,82,108,98,86,80,73,64,84,76,66]},
+  "162S137-27":{f:33,v:[119,110,96,121,110,96,106,96,84,106,96,84,82,74,65,82,74,65]},
+  "162S137-30":{f:33,v:[124,114,99,125,114,99,109,99,87,109,99,87,84,77,67,84,77,67]},
+  "162S137-33":{f:33,v:[129,117,103,129,117,103,113,103,90,113,103,90,87,79,69,87,79,69]},
+  "250S125-18":{f:33,v:[101,93,83,139,126,109,90,83,74,121,109,92,72,66,58,89,75,62],e:"000000000000001011"},
+  "250S125-27":{f:33,v:[116,107,96,161,146,127,104,96,86,140,127,111,84,78,69,108,98,82]},
+  "250S125-30":{f:33,v:[121,111,99,166,151,131,108,99,89,145,131,115,87,80,72,112,101,87]},
+  "250S125-33":{f:33,v:[126,116,103,171,156,136,112,103,92,150,136,119,90,83,74,115,105,91]},
+  "250S125-43":{f:33,v:[141,130,115,186,169,148,125,115,102,163,148,129,100,92,82,126,114,100]},
+  "250S137-27":{f:33,v:[132,122,110,168,153,133,118,110,98,147,133,117,96,89,80,114,103,90]},
+  "250S137-30":{f:33,v:[137,126,113,173,158,138,122,113,101,152,138,120,99,92,82,117,106,93]},
+  "250S137-33":{f:33,v:[142,131,117,179,163,142,127,117,105,157,142,124,103,95,85,121,110,96]},
+  "250S137-43":{f:33,v:[159,146,130,195,177,155,141,130,115,170,155,135,113,104,93,131,119,104]},
+  "250S162-33":{f:33,v:[162,149,134,188,171,149,145,134,120,164,149,130,118,109,97,127,115,101]},
+  "250S162-43":{f:33,v:[180,165,147,205,186,162,160,147,131,179,162,142,129,119,106,138,125,110]},
+  "350S125-18":{f:33,v:[110,102,90,150,137,119,99,90,80,132,119,101,78,71,63,98,86,72],e:"000000000001011111"},
+  "350S125-27":{f:33,v:[127,117,105,179,165,147,113,105,93,160,147,127,91,85,76,124,111,93]},
+  "350S125-30":{f:33,v:[131,121,108,185,170,153,117,108,97,165,153,134,95,87,78,131,117,99]},
+  "350S125-33":{f:33,v:[136,125,112,192,177,158,121,112,100,171,158,141,98,91,81,137,124,106]},
+  "350S125-43":{f:33,v:[151,139,124,211,195,174,134,124,110,188,174,155,108,99,89,151,138,121]},
+  "350S137-27":{f:33,v:[143,132,119,204,189,169,128,119,107,183,169,148,104,97,87,143,127,107],e:"000000000000000001"},
+  "350S137-30":{f:33,v:[148,137,123,211,195,175,132,123,110,189,175,154,108,100,90,150,135,114]},
+  "350S137-33":{f:33,v:[153,142,127,218,201,181,137,127,114,195,181,160,111,103,92,156,141,120]},
+  "350S137-43":{f:33,v:[170,156,139,238,220,197,151,139,124,213,197,175,122,112,101,170,155,135]},
+  "350S162-33":{f:33,v:[174,161,145,243,221,193,156,145,130,213,193,169,127,118,106,164,149,130]},
+  "350S162-43":{f:33,v:[192,177,158,265,240,210,171,158,141,231,210,183,138,128,115,179,162,142]},
+  "362S125-18":{f:33,v:[111,103,91,152,139,120,100,91,81,133,120,102,79,72,64,99,88,73],e:"000000000001011111"},
+  "362S125-27":{f:33,v:[128,118,106,180,167,148,114,106,94,161,148,129,92,85,77,125,112,95]},
+  "362S125-30":{f:33,v:[132,122,109,186,172,154,118,109,98,167,154,136,96,88,79,132,119,101]},
+  "362S125-33":{f:33,v:[137,127,113,194,178,159,123,113,101,173,159,142,99,92,82,139,126,108]},
+  "362S125-43":{f:33,v:[152,140,125,213,197,176,135,125,111,190,176,156,109,100,90,153,140,122]},
+  "362S137-27":{f:33,v:[144,134,120,206,191,171,130,120,108,185,171,150,105,98,88,145,129,109],e:"000000000000000001"},
+  "362S137-30":{f:33,v:[149,138,124,212,197,176,134,124,111,190,176,156,109,101,90,152,137,116]},
+  "362S137-33":{f:33,v:[155,143,128,220,203,182,138,128,115,197,182,162,112,104,93,158,143,122]},
+  "362S137-43":{f:33,v:[171,158,140,240,222,199,152,140,125,215,199,177,123,113,102,173,158,137]},
+  "362S162-33":{f:33,v:[176,163,146,250,227,198,158,146,131,218,198,173,128,119,107,169,153,134]},
+  "362S162-43":{f:33,v:[194,179,160,272,247,216,173,160,143,238,216,189,140,129,116,184,167,146]},
+  "400S125-18":{f:33,v:[114,105,94,156,143,125,102,94,83,138,125,107,81,74,66,103,92,77],e:"111111111111111111"},
+  "400S125-27":{f:33,v:[131,121,109,185,171,153,117,109,97,166,153,134,95,88,79,130,117,99]},
+  "400S125-30":{f:33,v:[136,125,112,192,177,158,121,112,100,171,158,141,98,91,81,137,124,105]},
+  "400S125-33":{f:33,v:[141,130,116,199,183,164,126,116,104,177,164,146,102,94,84,143,131,112]},
+  "400S125-43":{f:33,v:[156,144,128,219,202,180,139,128,114,195,180,161,112,103,92,157,144,127]},
+  "400S137-27":{f:33,v:[148,137,123,211,196,176,133,123,110,190,176,156,108,100,90,151,135,114],e:"000000000000000001"},
+  "400S137-30":{f:33,v:[153,142,127,218,202,181,137,127,114,196,181,161,111,103,93,157,142,121]},
+  "400S137-33":{f:33,v:[159,147,131,225,208,187,142,131,118,202,187,167,115,107,96,163,148,128]},
+  "400S137-43":{f:33,v:[175,162,144,247,228,204,156,144,129,220,204,182,126,116,104,178,163,142]},
+  "400S162-33":{f:33,v:[180,167,150,257,238,213,162,150,134,231,213,187,131,122,109,182,165,141]},
+  "400S162-43":{f:33,v:[199,183,164,280,259,232,177,164,146,251,232,203,143,132,119,198,180,157]},
+  "600S125-27":{f:33,v:[149,138,124,215,198,177,134,124,112,192,177,158,110,102,91,155,142,124],e:"111111111111111111"},
+  "600S125-30":{f:33,v:[153,142,128,221,205,183,138,128,115,199,183,164,113,105,94,160,148,131],e:"000000000000000001"},
+  "600S125-33":{f:33,v:[158,147,132,227,211,190,142,132,118,204,190,170,116,107,97,166,153,137]},
+  "600S125-43":{f:33,v:[174,160,143,246,228,204,155,143,128,220,204,183,125,116,104,180,167,150]},
+  "600S137-27":{f:33,v:[168,156,141,242,224,201,151,141,126,217,201,180,124,115,103,176,163,142],e:"111111111111111111"},
+  "600S137-30":{f:33,v:[173,160,144,250,231,207,156,144,130,224,207,186,127,118,106,182,168,149],e:"000000000000000001"},
+  "600S137-33":{f:33,v:[179,165,149,257,238,214,160,149,134,231,214,192,131,122,110,188,174,155],e:"000000000000000001"},
+  "600S137-43":{f:33,v:[195,180,161,277,257,231,174,161,144,249,231,208,141,131,118,203,189,170]},
+  "600S162-33":{f:33,v:[203,188,169,293,272,245,182,169,152,264,245,221,149,139,125,216,200,177],e:"000000000000000001"},
+  "600S162-43":{f:33,v:[221,204,183,316,292,263,198,183,164,284,263,237,161,149,134,232,215,192]}
+};
+const CEILING_S_INT360 = {
+  "162S125-18":{f:33,v:[87,79,70,89,81,71,77,70,61,78,71,61,59,53,45,59,54,46]},
+  "162S125-27":{f:33,v:[102,92,81,102,92,81,89,81,70,89,81,70,69,62,54,69,62,54]},
+  "162S125-30":{f:33,v:[105,95,83,105,95,83,92,83,73,92,83,73,71,64,56,71,64,56]},
+  "162S125-33":{f:33,v:[108,98,86,108,98,86,95,86,75,95,86,75,73,66,58,73,66,58]},
+  "162S137-27":{f:33,v:[106,96,84,106,96,84,93,84,74,93,84,74,72,65,57,72,65,57]},
+  "162S137-30":{f:33,v:[109,99,87,109,99,87,96,87,76,96,87,76,74,67,59,74,67,59]},
+  "162S137-33":{f:33,v:[113,103,90,113,103,90,99,90,78,99,90,78,76,69,61,76,69,61]},
+  "250S125-18":{f:33,v:[101,93,83,123,111,97,90,83,74,107,97,84,72,66,58,82,74,62],e:"000000000000001011"},
+  "250S125-27":{f:33,v:[116,107,96,141,128,112,104,96,86,123,112,97,84,78,69,95,86,75]},
+  "250S125-30":{f:33,v:[121,111,99,145,132,115,108,99,89,127,115,101,87,80,72,98,89,77]},
+  "250S125-33":{f:33,v:[126,116,103,150,136,119,112,103,92,131,119,104,90,83,74,101,92,80]},
+  "250S125-43":{f:33,v:[141,130,115,163,148,129,125,115,102,142,129,113,100,92,82,110,100,87]},
+  "250S137-27":{f:33,v:[132,122,110,147,133,117,118,110,98,128,117,102,96,89,79,99,90,79]},
+  "250S137-30":{f:33,v:[137,126,113,152,138,120,122,113,101,132,120,105,99,92,81,102,93,81]},
+  "250S137-33":{f:33,v:[142,131,117,157,142,124,127,117,105,137,124,109,103,95,84,106,96,84]},
+  "250S137-43":{f:33,v:[159,146,130,170,155,135,141,130,115,149,135,118,113,104,91,115,104,91]},
+  "250S162-33":{f:33,v:[162,149,130,164,149,130,144,130,114,144,130,114,111,101,88,111,101,88]},
+  "250S162-43":{f:33,v:[179,162,142,179,162,142,156,142,124,156,142,124,121,110,96,121,110,96]},
+  "350S125-18":{f:33,v:[110,102,90,150,137,119,99,90,80,132,119,101,78,71,63,98,86,72],e:"000000000001011111"},
+  "350S125-27":{f:33,v:[127,117,105,179,165,144,113,105,93,159,144,126,91,85,76,122,111,93]},
+  "350S125-30":{f:33,v:[131,121,108,185,170,149,117,108,97,164,149,130,95,87,78,127,115,99]},
+  "350S125-33":{f:33,v:[136,125,112,192,176,154,121,112,100,170,154,135,98,91,81,131,119,104]},
+  "350S125-43":{f:33,v:[151,139,124,211,192,167,134,124,110,184,167,146,108,99,89,142,129,113]},
+  "350S137-27":{f:33,v:[143,132,119,190,173,151,128,119,107,166,151,132,104,97,87,128,117,102]},
+  "350S137-30":{f:33,v:[148,137,123,196,178,156,132,123,110,171,156,136,108,100,90,132,120,105]},
+  "350S137-33":{f:33,v:[153,142,127,203,184,161,137,127,114,177,161,141,111,103,92,137,124,109]},
+  "350S137-43":{f:33,v:[170,156,139,220,200,175,151,139,124,193,175,153,122,112,101,149,135,118]},
+  "350S162-33":{f:33,v:[174,161,145,213,193,169,156,145,130,186,169,147,127,118,106,143,130,114]},
+  "350S162-43":{f:33,v:[192,177,158,231,210,183,171,158,141,202,183,160,138,128,115,156,142,124]},
+  "362S125-18":{f:33,v:[111,103,91,152,139,120,100,91,81,133,120,102,79,72,64,99,88,73],e:"000000000001011111"},
+  "362S125-27":{f:33,v:[128,118,106,180,167,148,114,106,94,161,148,129,92,85,77,125,112,95]},
+  "362S125-30":{f:33,v:[132,122,109,186,172,153,118,109,98,167,153,134,96,88,79,130,118,101]},
+  "362S125-33":{f:33,v:[137,127,113,194,178,158,123,113,101,173,158,138,99,92,82,135,122,107]},
+  "362S125-43":{f:33,v:[152,140,125,213,197,172,135,125,111,189,172,150,109,100,90,146,133,116]},
+  "362S137-27":{f:33,v:[144,134,120,195,177,155,130,120,108,171,155,135,105,98,88,132,120,105],e:"000000000000000001"},
+  "362S137-30":{f:33,v:[149,138,124,202,183,160,134,124,111,176,160,140,109,101,90,136,124,108]},
+  "362S137-33":{f:33,v:[155,143,128,208,189,165,138,128,115,182,165,144,112,104,93,141,128,112]},
+  "362S137-43":{f:33,v:[171,158,140,227,206,180,152,140,125,198,180,157,123,113,102,153,139,121]},
+  "362S162-33":{f:33,v:[176,163,146,218,198,173,158,146,131,191,173,151,128,119,107,147,134,117]},
+  "362S162-43":{f:33,v:[194,179,160,238,216,189,173,160,143,207,189,165,140,129,116,160,146,127]},
+  "400S125-18":{f:33,v:[114,105,94,156,143,125,102,94,83,138,125,107,81,74,66,103,92,77],e:"111111111111111111"},
+  "400S125-27":{f:33,v:[131,121,109,185,171,153,117,109,97,166,153,134,95,88,79,130,117,99]},
+  "400S125-30":{f:33,v:[136,125,112,192,177,158,121,112,100,171,158,141,98,91,81,137,124,105]},
+  "400S125-33":{f:33,v:[141,130,116,199,183,164,126,116,104,177,164,146,102,94,84,143,131,112]},
+  "400S125-43":{f:33,v:[156,144,128,219,202,180,139,128,114,195,180,161,112,103,92,157,144,126]},
+  "400S137-27":{f:33,v:[148,137,123,211,192,167,133,123,110,184,167,146,108,100,90,142,129,113],e:"000000000000000001"},
+  "400S137-30":{f:33,v:[153,142,127,218,198,173,137,127,114,190,173,151,111,103,93,147,133,117]},
+  "400S137-33":{f:33,v:[159,147,131,225,204,179,142,131,118,197,179,156,115,107,96,152,138,121]},
+  "400S137-43":{f:33,v:[175,162,144,245,222,194,156,144,129,214,194,170,126,116,104,165,150,131]},
+  "400S162-33":{f:33,v:[180,167,150,236,214,187,162,150,134,206,187,163,131,122,109,159,144,126]},
+  "400S162-43":{f:33,v:[199,183,164,256,233,203,177,164,146,224,203,178,143,132,119,173,157,137]},
+  "600S125-27":{f:33,v:[149,138,124,215,198,177,134,124,112,192,177,158,110,102,91,155,142,124],e:"111111111111111111"},
+  "600S125-30":{f:33,v:[153,142,128,221,205,183,138,128,115,199,183,164,113,105,94,160,148,131],e:"000000000000000001"},
+  "600S125-33":{f:33,v:[158,147,132,227,211,190,142,132,118,204,190,170,116,107,97,166,153,137]},
+  "600S125-43":{f:33,v:[174,160,143,246,228,204,155,143,128,220,204,183,125,116,104,180,167,150]},
+  "600S137-27":{f:33,v:[168,156,141,242,224,201,151,141,126,217,201,180,124,115,103,176,163,142],e:"111111111111111111"},
+  "600S137-30":{f:33,v:[173,160,144,250,231,207,156,144,130,224,207,186,127,118,106,182,168,149],e:"000000000000000001"},
+  "600S137-33":{f:33,v:[179,165,149,257,238,214,160,149,134,231,214,192,131,122,110,188,174,155],e:"000000000000000001"},
+  "600S137-43":{f:33,v:[195,180,161,277,257,231,174,161,144,249,231,208,141,131,118,203,189,170]},
+  "600S162-33":{f:33,v:[203,188,169,293,272,245,182,169,152,264,245,221,149,139,125,216,198,173],e:"000000000000000001"},
+  "600S162-43":{f:33,v:[221,204,183,316,292,263,198,183,164,284,263,237,161,149,134,232,215,189]}
+};
+const CEILING_S_EXT240 = {
+  "250S137-33":{f:33,v:[91,84,74,105,95,83,86,79,69,97,88,77,81,74,64,92,83,70,78,71,61,87,79,65,74,67,58,83,75,61,69,62,52,77,67,54],e:"000000000000000001001001001001001011"},
+  "250S137-43":{f:33,v:[100,92,82,114,103,90,94,86,76,106,96,84,89,82,71,99,90,79,85,78,67,94,86,75,82,74,64,90,82,70,76,68,59,84,76,63]},
+  "250S137-54":{f:50,v:[109,100,89,122,111,97,102,94,84,113,103,90,97,89,80,106,97,84,93,85,76,101,92,80,89,82,73,97,88,77,84,77,69,90,81,71]},
+  "250S137-68":{f:50,v:[121,110,98,130,118,103,113,103,92,120,109,96,107,98,87,113,103,90,102,93,83,108,98,85,98,90,80,103,94,82,91,84,74,96,87,76]},
+  "250S162-33":{f:33,v:[105,96,84,110,100,87,98,89,77,102,93,81,92,84,71,96,87,75,88,79,67,91,83,70,84,75,63,87,79,65,77,68,57,81,71,58],e:"000000000000001001001001001011011011"},
+  "250S162-43":{f:33,v:[114,105,92,120,109,95,107,98,85,111,101,88,101,92,79,104,95,83,96,87,75,99,90,79,92,83,71,95,86,75,85,76,65,88,80,68]},
+  "250S162-54":{f:50,v:[124,114,102,128,116,102,116,107,94,119,108,94,110,102,89,112,102,89,106,96,84,106,96,84,102,92,81,102,92,81,94,86,75,94,86,75]},
+  "250S162-68":{f:50,v:[136,124,108,137,124,108,127,115,101,127,115,101,119,108,95,119,108,95,113,103,90,113,103,90,108,99,86,108,99,86,101,91,80,101,91,80]},
+  "250S200-33":{f:33,v:[116,106,91,116,106,92,108,98,83,108,98,86,102,91,77,102,92,79,96,85,72,97,88,73,91,81,68,92,84,68,83,73,61,86,75,61],e:"000000001001001001001001011011111111"},
+  "250S200-43":{f:33,v:[127,115,100,127,115,100,118,107,93,118,107,93,111,100,88,111,100,88,105,95,83,105,95,83,100,91,79,100,91,80,93,85,71,93,85,72],e:"000000000000000000000000000000001001"},
+  "250S200-54":{f:50,v:[136,123,108,136,123,108,126,114,100,126,114,100,118,108,94,118,108,94,112,102,89,112,102,89,108,98,85,108,98,85,100,91,79,100,91,79]},
+  "250S200-68":{f:50,v:[145,132,115,145,132,115,135,122,107,135,122,107,127,115,100,127,115,100,120,109,95,120,109,95,115,105,91,115,105,91,107,97,85,107,97,85]},
+  "362S137-33":{f:33,v:[100,93,83,136,121,102,94,87,78,124,110,92,90,83,74,115,102,85,86,80,70,108,95,79,83,76,67,102,90,74,78,71,61,92,81,66],e:"000001000001001011001011011111011111"},
+  "362S137-43":{f:33,v:[109,101,90,150,136,116,103,95,85,139,125,106,98,90,81,130,116,98,94,87,77,122,109,91,90,83,74,116,103,86,85,78,68,106,93,78],e:"000000000000000000000000000001001001"},
+  "362S137-54":{f:50,v:[118,109,97,162,148,129,111,102,91,151,137,120,105,97,87,142,129,113,101,93,83,135,122,106,97,90,80,129,117,99,91,85,76,120,109,89]},
+  "362S137-68":{f:50,v:[129,119,106,174,158,138,121,111,99,161,146,128,115,106,94,152,138,120,110,101,90,144,131,114,105,97,87,138,125,109,99,91,81,128,116,101]},
+  "362S162-33":{f:33,v:[114,106,94,146,133,111,108,100,88,136,121,100,103,95,83,126,111,92,98,90,78,118,104,85,95,86,74,111,97,79,88,80,68,100,87,71],e:"000001001011001011011111011111111111"},
+  "362S162-43":{f:33,v:[124,115,103,159,144,126,117,108,96,148,134,116,111,103,91,139,126,107,107,99,87,132,120,100,103,95,83,126,113,94,96,88,76,116,102,84],e:"000000000000000000000001000001001011"},
+  "362S162-54":{f:50,v:[134,124,111,170,155,135,126,116,104,158,144,126,120,111,99,149,135,118,115,106,95,141,128,112,111,103,92,135,123,107,104,96,87,126,114,96]},
+  "362S162-68":{f:50,v:[146,135,120,182,166,145,137,126,113,169,154,134,130,120,107,159,145,126,125,115,102,151,137,120,120,111,99,145,131,115,113,104,93,134,122,107]},
+  "362S200-33":{f:33,v:[132,121,106,154,140,118,124,113,97,143,129,105,117,106,90,135,118,96,111,100,85,126,109,89,106,95,80,118,102,83,97,87,73,105,91,75],e:"001001001011011111011111111111111111"},
+  "362S200-43":{f:33,v:[144,134,119,168,153,133,136,126,110,156,142,124,129,119,104,147,133,116,124,113,98,139,127,107,119,108,93,133,121,100,110,100,85,124,110,90],e:"000000000000000001001001001001011011"},
+  "362S200-54":{f:50,v:[155,143,129,180,164,143,146,135,121,167,152,133,139,129,115,157,143,125,133,124,111,149,136,119,129,119,107,143,130,113,121,112,100,133,121,105]},
+  "362S200-68":{f:50,v:[169,155,139,193,175,153,158,146,130,179,163,142,150,139,124,168,153,134,144,133,119,160,145,127,139,128,115,153,139,121,130,120,108,142,129,113]},
+  "400S137-33":{f:33,v:[103,95,85,141,126,107,97,90,80,130,115,97,92,85,76,120,107,89,88,82,72,113,100,83,85,79,69,107,94,78,80,73,64,97,85,70],e:"000001001001001011001111011111111111"},
+  "400S137-43":{f:33,v:[112,103,93,156,141,121,105,97,87,144,130,111,100,93,83,135,121,102,96,89,79,128,114,96,93,86,76,121,108,91,87,81,71,111,98,82],e:"000000000000000000000001000001001001"},
+  "400S137-54":{f:50,v:[121,112,100,171,158,139,114,105,94,161,148,129,108,100,89,153,139,122,104,96,86,146,132,114,100,92,82,139,127,106,94,87,78,129,116,95]},
+  "400S137-68":{f:50,v:[132,122,108,184,170,149,124,114,101,173,158,138,118,108,96,164,149,130,112,103,92,156,141,124,108,100,89,149,135,118,101,94,84,138,126,110]},
+  "400S162-33":{f:33,v:[117,109,97,157,139,117,110,102,91,143,127,106,105,97,86,132,117,97,101,93,81,124,109,90,97,89,77,117,102,84,91,83,71,106,92,75],e:"000001001011001111011111011111111111"},
+  "400S162-43":{f:33,v:[127,118,106,172,156,134,120,111,99,159,144,122,114,106,94,150,134,113,110,101,90,141,125,105,106,98,86,134,118,99,99,91,79,122,107,89],e:"000000000000000001000001001001001011"},
+  "400S162-54":{f:50,v:[138,127,114,184,167,146,129,120,107,171,155,135,123,114,102,161,146,127,118,109,98,153,139,121,114,105,94,146,133,114,107,99,89,135,123,102]},
+  "400S162-68":{f:50,v:[150,138,123,197,179,156,141,129,115,183,166,145,133,123,110,172,156,136,128,118,105,163,148,130,123,113,101,156,142,124,116,107,95,145,132,115]},
+  "400S200-33":{f:33,v:[136,125,110,166,149,124,128,117,101,154,135,111,121,110,94,142,124,102,115,104,89,132,115,94,110,99,84,124,108,88,101,90,76,111,96,79],e:"001011001011011111111111111111111111"},
+  "400S200-43":{f:33,v:[148,137,122,181,164,144,139,129,114,168,153,133,133,122,108,158,144,123,127,117,102,150,136,114,122,112,97,144,130,106,114,104,89,133,116,95],e:"000000000001000001001001001011011111"},
+  "400S200-54":{f:50,v:[159,147,132,194,176,154,150,138,124,180,164,143,142,132,118,170,154,135,137,126,113,161,146,128,132,122,109,154,140,122,124,115,103,143,130,111]},
+  "400S200-68":{f:50,v:[173,159,142,208,189,165,162,150,134,193,175,153,154,142,127,182,165,144,148,136,122,173,157,137,142,131,118,165,150,131,134,124,111,153,139,122]},
+  "400S250-43":{f:33,v:[168,155,136,191,173,151,158,145,125,177,161,138,150,136,117,167,151,126,142,129,110,158,143,116,136,122,104,151,134,109,125,112,94,138,119,97],e:"000000000001001001001011001011011111"},
+  "400S250-54":{f:50,v:[180,167,150,205,186,162,170,157,141,190,173,151,162,150,133,179,162,142,155,144,127,170,154,135,150,138,121,162,148,129,141,129,112,151,137,120]},
+  "400S250-68":{f:50,v:[195,180,161,219,199,174,184,169,152,204,185,162,175,161,144,192,174,152,167,155,139,182,165,144,161,149,133,174,158,138,152,140,125,162,147,128]},
+  "600S137-33":{f:33,v:[117,109,98,167,153,133,111,103,92,157,142,122,106,98,88,148,133,114,101,94,84,140,126,106,98,91,81,133,119,101,92,85,76,122,109,89],e:"001011001111011111011111111111111111"},
+  "600S137-43":{f:33,v:[126,117,105,182,168,149,119,110,99,171,158,138,113,105,95,163,149,129,109,101,91,155,141,121,105,98,88,149,135,115,99,92,83,138,124,105],e:"000000000001000001001011001011001111"},
+  "600S137-54":{f:50,v:[135,125,112,193,179,161,127,118,106,182,169,152,121,112,101,174,161,145,116,108,97,167,155,139,112,104,93,161,150,134,106,98,88,152,141,124]},
+  "600S137-68":{f:50,v:[146,135,120,206,191,171,137,127,113,194,180,161,130,120,108,185,171,154,125,115,103,177,164,148,120,111,100,171,159,142,113,105,94,161,150,134]},
+  "600S162-33":{f:33,v:[134,124,112,192,176,152,126,117,106,179,163,139,120,112,101,169,152,129,116,108,97,160,143,121,112,104,94,151,131,107,106,98,88,135,117,95],e:"001111011111011111111111111111111111"},
+  "600S162-43":{f:33,v:[144,133,120,207,191,167,136,126,113,194,178,154,129,120,108,184,167,144,124,115,104,175,158,135,120,111,100,167,151,128,113,105,95,154,138,117],e:"000001000001001011001011001111011111"},
+  "600S162-54":{f:50,v:[154,142,128,220,204,184,145,134,120,208,193,173,138,128,115,198,184,165,132,123,110,190,177,158,128,118,106,184,171,152,120,112,100,173,160,137]},
+  "600S162-68":{f:50,v:[166,153,137,235,218,195,156,144,129,222,205,184,148,137,123,211,195,176,142,131,118,202,188,169,137,127,113,195,181,162,129,119,107,184,171,152]},
+  "600S200-33":{f:33,v:[155,144,130,215,194,165,146,136,122,198,177,150,140,130,116,185,161,131,134,124,110,174,154,121,130,120,106,161,139,114,122,112,98,144,124,102],e:"011111011111111111111111111111111111"},
+  "600S200-43":{f:33,v:[166,154,139,238,217,188,157,146,131,222,201,172,150,139,125,208,188,157,144,134,120,197,176,145,139,129,116,188,166,136,131,122,108,172,149,122],e:"000001001011001111011111011111111111"},
+  "600S200-54":{f:50,v:[178,164,148,255,237,211,167,155,139,241,224,196,159,148,133,230,211,182,153,142,128,221,200,168,148,137,124,211,192,157,139,129,117,196,172,141]},
+  "600S200-68":{f:50,v:[191,177,158,272,252,226,180,166,149,257,238,210,171,158,142,245,226,198,164,152,136,235,215,188,158,146,131,226,206,180,149,138,124,210,191,167]},
+  "600S250-43":{f:33,v:[189,176,158,259,235,200,179,166,149,241,215,181,170,158,142,224,197,161,164,152,135,211,187,149,158,147,129,197,171,139,149,137,119,176,153,125],e:"001011001011011111011111111111111111"},
+  "600S250-54":{f:50,v:[202,187,168,279,253,221,190,176,159,259,235,205,181,168,151,243,221,187,174,162,145,231,210,173,168,156,141,221,199,162,159,147,132,205,178,145],e:"000000000000000000000000000000000001"},
+  "600S250-68":{f:50,v:[217,200,180,299,272,237,204,189,169,278,252,220,194,180,161,261,237,207,186,172,155,248,226,197,180,166,150,237,216,188,169,157,141,220,200,175]},
+  "800S137-33":{f:33,v:[127,118,105,180,167,148,120,111,99,169,156,137,114,105,94,161,148,128,109,101,91,154,140,121,105,97,87,148,134,114,99,92,82,137,123,104],e:"111111111111111111111111111111111111"},
+  "800S137-43":{f:33,v:[137,127,115,197,182,163,129,120,108,185,171,152,123,114,103,176,163,144,118,110,99,169,155,136,114,106,95,163,149,130,108,100,90,152,139,120],e:"000001000001001011001011001111011111"},
+  "800S137-54":{f:50,v:[146,135,122,210,195,175,138,128,115,198,184,165,131,122,109,189,175,157,126,117,105,181,168,151,122,113,101,175,162,145,115,106,96,165,153,137]},
+  "800S137-68":{f:50,v:[157,145,130,223,207,186,148,137,122,211,195,175,141,130,116,201,186,167,135,125,112,193,178,160,130,120,108,186,172,155,122,113,102,175,163,146]},
+  "800S162-33":{f:33,v:[144,134,120,205,189,165,136,126,113,192,176,152,129,120,108,182,165,141,124,115,103,173,156,133,120,111,100,165,148,125,113,105,94,152,135,113],e:"111111111111111111111111111111111111"},
+  "800S162-43":{f:33,v:[156,145,131,224,207,184,147,137,123,210,194,171,141,131,117,200,184,160,135,125,112,191,175,151,131,121,108,184,167,144,123,114,102,171,154,131],e:"000001001011001111001111011111111111"},
+  "800S162-54":{f:50,v:[166,154,139,240,222,200,157,145,131,226,210,188,149,139,125,216,200,179,144,133,120,207,191,171,139,129,116,200,185,165,131,121,109,188,174,155],e:"000000000000000000000000000000000001"},
+  "800S162-68":{f:50,v:[179,165,148,255,236,212,168,155,139,240,223,200,160,148,133,229,212,191,153,142,127,220,204,184,148,137,123,212,197,177,139,129,116,200,186,167]},
+  "800S200-33":{f:33,v:[169,157,142,241,217,185,159,148,134,223,199,169,152,142,128,208,185,156,146,136,123,196,174,145,142,132,118,185,162,132,134,124,110,167,145,114],e:"111111111111111111111111111111111111"},
+  "800S200-43":{f:33,v:[181,168,151,263,243,214,171,159,143,247,227,198,163,151,137,234,214,183,157,146,131,224,203,170,151,141,127,214,194,159,143,133,120,198,174,142],e:"001011001111011111011111111111111111"},
+  "800S200-54":{f:50,v:[192,178,161,278,258,233,182,168,152,262,244,220,173,161,145,250,233,210,166,154,139,241,224,198,161,149,134,233,216,185,152,141,127,220,202,165],e:"000000000000000000000001000001000001"},
+  "800S200-68":{f:50,v:[206,191,171,295,274,247,194,180,161,279,258,233,185,171,154,266,247,222,177,164,148,255,237,213,171,159,143,247,229,206,161,150,135,233,216,193]}
+};
+const CEILING_S_EXT360 = {
+  "250S137-33":{f:33,v:[91,83,73,92,83,73,85,77,67,85,77,67,80,73,63,80,73,63,76,69,60,76,69,60,73,66,58,73,66,58,67,61,52,67,61,54],e:"000000000000000000001001001001001001"},
+  "250S137-43":{f:33,v:[99,90,79,99,90,79,92,84,73,92,84,73,87,79,69,87,79,69,83,75,66,83,75,66,79,72,63,79,72,63,73,67,58,73,67,58]},
+  "250S137-54":{f:50,v:[106,97,84,106,97,84,99,90,78,99,90,78,93,84,74,93,84,74,88,80,70,88,80,70,84,77,67,84,77,67,78,71,62,78,71,62]},
+  "250S137-68":{f:50,v:[113,103,90,113,103,90,105,96,84,105,96,84,99,90,79,99,90,79,94,85,75,94,85,75,90,82,71,90,82,71,84,76,66,84,76,66]},
+  "250S162-33":{f:33,v:[96,87,76,96,87,76,89,81,71,89,81,71,84,76,67,84,76,67,80,72,63,80,72,63,76,69,61,76,69,61,71,64,56,71,64,56],e:"000000000000000000001001001001011011"},
+  "250S162-43":{f:33,v:[104,95,83,104,95,83,97,88,77,97,88,77,91,83,72,91,83,72,87,79,69,87,79,69,83,75,66,83,75,66,77,70,61,77,70,61]},
+  "250S162-54":{f:50,v:[112,102,89,112,102,89,104,94,82,104,94,82,98,89,77,98,89,77,93,84,74,93,84,74,89,81,70,89,81,70,82,75,65,82,75,65]},
+  "250S162-68":{f:50,v:[119,108,95,119,108,95,111,101,88,111,101,88,104,95,83,104,95,83,99,90,79,99,90,79,95,86,75,95,86,75,88,80,70,88,80,70]},
+  "250S200-33":{f:33,v:[102,92,81,102,92,81,94,86,75,94,86,75,89,81,71,89,81,71,84,77,67,84,77,67,81,73,64,81,73,64,75,68,59,75,68,59],e:"000000000000001001001001001001011011"},
+  "250S200-43":{f:33,v:[111,100,88,111,100,88,103,93,81,103,93,81,97,88,77,97,88,77,92,83,73,92,83,73,88,80,70,88,80,70,81,74,65,81,74,65]},
+  "250S200-54":{f:50,v:[118,108,94,118,108,94,110,100,87,110,100,87,103,94,82,103,94,82,98,89,78,98,89,78,94,85,75,94,85,75,87,79,69,87,79,69]},
+  "250S200-68":{f:50,v:[127,115,100,127,115,100,118,107,93,118,107,93,111,100,88,111,100,88,105,95,83,105,95,83,100,91,80,100,91,80,93,85,74,93,85,74]},
+  "362S137-33":{f:33,v:[100,93,83,122,111,97,94,87,78,113,103,90,90,83,74,106,97,84,86,80,70,101,92,79,83,76,67,97,88,74,78,71,61,90,81,66],e:"000000000001001001001011011011011111"},
+  "362S137-43":{f:33,v:[109,101,90,133,120,105,103,95,85,123,112,98,98,90,81,116,105,92,94,87,77,110,100,87,90,83,74,105,96,83,85,78,68,98,89,77],e:"000000000000000000000000000001001001"},
+  "362S137-54":{f:50,v:[118,109,97,142,129,113,111,102,91,132,120,105,105,97,87,124,113,98,101,93,83,118,107,93,97,90,80,113,102,89,91,85,76,105,95,83]},
+  "362S137-68":{f:50,v:[129,119,106,152,138,120,121,111,99,141,128,112,115,106,94,132,120,105,110,101,90,126,114,100,105,97,87,120,109,95,99,91,81,112,101,89]},
+  "362S162-33":{f:33,v:[114,106,94,128,116,101,108,100,88,119,108,94,103,95,83,112,101,89,98,90,78,106,96,84,95,86,74,101,92,79,88,80,68,94,85,71],e:"000001001001001011011011011111111111"},
+  "362S162-43":{f:33,v:[124,115,103,139,126,110,117,108,96,129,117,102,111,103,91,121,110,96,107,99,87,115,105,91,103,95,83,110,100,88,96,88,76,102,93,81],e:"000000000000000000000000000001001001"},
+  "362S162-54":{f:50,v:[134,124,111,149,135,118,126,116,104,138,126,110,120,111,99,130,118,103,115,106,95,123,112,98,111,103,92,118,107,94,104,96,87,110,100,87]},
+  "362S162-68":{f:50,v:[146,135,120,159,145,126,137,126,113,148,134,117,130,120,107,139,126,110,125,115,102,132,120,105,120,111,99,126,115,100,113,104,93,117,107,93]},
+  "362S200-33":{f:33,v:[132,121,106,135,122,107,124,113,97,125,114,99,117,106,90,118,107,93,111,100,85,112,102,89,106,95,80,107,97,83,97,87,73,99,90,75],e:"001001001001011011011011111111111111"},
+  "362S200-43":{f:33,v:[144,133,116,147,133,116,136,124,108,136,124,108,128,116,102,128,116,102,122,111,97,122,111,97,116,106,92,116,106,92,108,98,85,108,98,86],e:"000000000000000000001001001001001001"},
+  "362S200-54":{f:50,v:[155,143,125,157,143,125,146,133,116,146,133,116,137,125,109,137,125,109,130,119,104,130,119,104,125,113,99,125,113,99,116,105,92,116,105,92]},
+  "362S200-68":{f:50,v:[168,153,134,168,153,134,156,142,124,156,142,124,147,134,117,147,134,117,140,127,111,140,127,111,134,121,106,134,121,106,124,113,98,124,113,98]},
+  "400S137-33":{f:33,v:[103,95,85,132,120,104,97,90,80,122,111,97,92,85,76,115,104,89,88,82,72,109,99,83,85,79,69,104,94,78,80,73,64,97,85,70],e:"000001001001001011001011011111111111"},
+  "400S137-43":{f:33,v:[112,103,93,143,130,114,105,97,87,133,121,105,100,93,83,125,114,99,96,89,79,119,108,94,93,86,76,114,103,90,87,81,71,105,96,82],e:"000000000000000000000001000001001001"},
+  "400S137-54":{f:50,v:[121,112,100,153,139,122,114,105,94,142,129,113,108,100,89,134,122,106,104,96,86,127,116,101,100,92,82,122,111,97,94,87,78,113,103,90]},
+  "400S137-68":{f:50,v:[132,122,108,164,149,130,124,114,101,152,138,121,118,108,96,143,130,114,112,103,92,136,124,108,108,100,89,130,118,103,101,94,84,121,110,96]},
+  "400S162-33":{f:33,v:[117,109,97,138,125,109,110,102,91,128,116,101,105,97,86,120,109,96,101,93,81,114,104,90,97,89,77,109,99,84,91,83,71,101,92,75],e:"000001001001001011011111011111111111"},
+  "400S162-43":{f:33,v:[127,118,106,150,136,119,120,111,99,139,126,110,114,106,94,131,119,104,110,101,90,124,113,99,106,98,86,119,108,94,99,91,79,110,100,88],e:"000000000000000000000001001001001011"},
+  "400S162-54":{f:50,v:[138,127,114,161,146,127,129,120,107,149,135,118,123,114,102,140,127,111,118,109,98,133,121,106,114,105,94,127,116,101,107,99,89,118,108,94]},
+  "400S162-68":{f:50,v:[150,138,123,172,156,136,141,129,115,160,145,127,133,123,110,150,136,119,128,118,105,143,130,113,123,113,101,136,124,108,116,107,95,127,115,101]},
+  "400S200-33":{f:33,v:[136,125,110,145,132,115,128,117,101,135,123,107,121,110,94,127,115,101,115,104,89,121,110,94,110,99,84,115,105,88,101,90,76,107,96,79],e:"001001001011011011111111111111111111"},
+  "400S200-43":{f:33,v:[148,137,122,158,144,126,139,129,114,147,133,117,133,122,108,138,126,110,127,117,102,131,119,104,122,112,97,126,114,100,114,104,89,117,106,92],e:"000000000000000001001001001001011011"},
+  "400S200-54":{f:50,v:[159,147,132,170,154,135,150,138,124,157,143,125,142,132,118,148,135,118,137,126,112,141,128,112,132,122,107,135,122,107,124,114,99,125,114,99]},
+  "400S200-68":{f:50,v:[173,159,142,182,165,144,162,150,134,169,153,134,154,142,126,159,144,126,148,136,120,151,137,120,142,131,114,144,131,114,134,122,106,134,122,106]},
+  "400S250-43":{f:33,v:[167,151,132,167,151,132,155,140,123,155,140,123,146,132,115,146,132,115,138,126,110,138,126,110,132,120,104,132,120,105,123,112,94,123,112,97],e:"000000000000001001001001001001011011"},
+  "400S250-54":{f:50,v:[179,162,142,179,162,142,166,151,132,166,151,132,156,142,124,156,142,124,148,135,118,148,135,118,142,129,113,142,129,113,132,120,105,132,120,105]},
+  "400S250-68":{f:50,v:[192,174,152,192,174,152,178,162,141,178,162,141,167,152,133,167,152,133,159,144,126,159,144,126,152,138,121,152,138,121,141,128,112,141,128,112]},
+  "600S137-33":{f:33,v:[117,109,98,167,153,133,111,103,92,157,142,122,106,98,88,148,133,114,101,94,84,140,126,106,98,91,81,133,119,101,92,85,76,122,109,89],e:"001011001111011111011111111111111111"},
+  "600S137-43":{f:33,v:[126,117,105,182,168,149,119,110,99,171,158,138,113,105,95,163,149,129,109,101,91,155,141,121,105,98,88,149,135,115,99,92,83,138,124,105],e:"000000000001000001001011001011001111"},
+  "600S137-54":{f:50,v:[135,125,112,193,179,161,127,118,106,182,169,152,121,112,101,174,161,145,116,108,97,167,155,139,112,104,93,161,150,133,106,98,88,152,141,124]},
+  "600S137-68":{f:50,v:[146,135,120,206,191,171,137,127,113,194,180,161,130,120,108,185,171,154,125,115,103,177,164,148,120,111,100,171,159,142,113,105,94,161,150,133]},
+  "600S162-33":{f:33,v:[134,124,112,189,172,150,126,117,106,176,160,139,120,112,101,165,150,129,116,108,97,157,143,121,112,104,94,150,131,107,106,98,88,135,117,95],e:"001111011111011111111111111111111111"},
+  "600S162-43":{f:33,v:[144,133,120,206,187,164,136,126,113,191,174,152,129,120,108,180,164,143,124,115,104,171,155,135,120,111,100,164,149,128,113,105,95,152,138,117],e:"000001000001001011001011001111011111"},
+  "600S162-54":{f:50,v:[154,142,128,220,201,175,145,134,120,205,186,163,138,128,115,193,175,153,132,123,110,183,167,146,128,118,106,175,159,139,120,112,100,163,148,129]},
+  "600S162-68":{f:50,v:[166,153,137,235,215,188,156,144,129,220,200,175,148,137,123,207,188,164,142,131,118,197,179,156,137,127,113,188,171,149,129,119,107,175,159,139]},
+  "600S200-33":{f:33,v:[155,144,130,199,180,158,146,136,122,184,168,146,140,130,116,174,158,131,134,124,110,165,150,121,130,120,106,158,139,114,122,112,98,144,124,102],e:"011111011111111111111111111111111111"},
+  "600S200-43":{f:33,v:[166,154,139,216,197,172,157,146,131,201,182,159,150,139,125,189,172,150,144,134,120,180,163,143,139,129,116,172,156,136,131,122,108,159,145,122],e:"000001001001001011011111011111111111"},
+  "600S200-54":{f:50,v:[178,164,148,232,211,184,167,155,139,216,196,171,159,148,133,203,184,161,153,142,128,193,175,153,148,137,124,184,168,146,139,129,117,171,156,136]},
+  "600S200-68":{f:50,v:[191,177,158,249,226,198,180,166,149,231,210,184,171,158,142,218,198,173,164,152,136,207,188,164,158,146,131,198,180,157,149,138,124,184,167,146]},
+  "600S250-43":{f:33,v:[189,176,158,227,206,180,179,166,149,210,191,167,170,158,142,198,180,157,164,152,135,188,171,149,158,147,129,180,163,139,149,137,119,167,152,125],e:"001001001011011011011111111111111111"},
+  "600S250-54":{f:50,v:[202,187,168,243,221,193,190,176,159,226,205,179,181,168,151,213,193,169,174,162,145,202,184,160,168,156,141,193,176,153,159,147,132,179,163,142]},
+  "600S250-68":{f:50,v:[217,200,180,261,237,207,204,189,169,243,220,193,194,180,161,228,207,181,186,172,155,217,197,172,180,166,150,207,188,165,169,157,141,193,175,153]},
+  "800S137-33":{f:33,v:[127,118,105,180,167,148,120,111,99,169,156,137,114,105,94,161,148,128,109,101,91,154,140,121,105,97,87,148,134,114,99,92,82,137,123,104],e:"111111111111111111111111111111111111"},
+  "800S137-43":{f:33,v:[137,127,115,197,182,163,129,120,108,185,171,152,123,114,103,176,163,144,118,110,99,169,155,136,114,106,95,163,149,130,108,100,90,152,139,120],e:"000001000001001011001011001111011111"},
+  "800S137-54":{f:50,v:[146,135,122,210,195,175,138,128,115,198,184,165,131,122,109,189,175,157,126,117,105,181,168,151,122,113,101,175,162,145,115,106,96,165,153,137]},
+  "800S137-68":{f:50,v:[157,145,130,223,207,186,148,137,122,211,195,175,141,130,116,201,186,167,135,125,112,193,178,160,130,120,108,186,172,155,122,113,102,175,163,146]},
+  "800S162-33":{f:33,v:[144,134,120,205,189,165,136,126,113,192,176,152,129,120,108,182,165,141,124,115,103,173,156,133,120,111,100,165,148,125,113,105,94,152,135,113],e:"111111111111111111111111111111111111"},
+  "800S162-43":{f:33,v:[156,145,131,224,207,184,147,137,123,210,194,171,141,131,117,200,184,160,135,125,112,191,175,151,131,121,108,184,167,144,123,114,102,171,154,131],e:"000001001011001111001111011111111111"},
+  "800S162-54":{f:50,v:[166,154,139,240,222,200,157,145,131,226,210,188,149,139,125,216,200,179,144,133,120,207,191,171,139,129,116,200,185,165,131,121,109,188,174,155],e:"000000000000000000000000000000000001"},
+  "800S162-68":{f:50,v:[179,165,148,255,236,212,168,155,139,240,223,200,160,148,133,229,212,191,153,142,127,220,204,184,148,137,123,212,197,177,139,129,116,200,186,167]},
+  "800S200-33":{f:33,v:[169,157,142,241,217,185,159,148,134,223,199,169,152,142,128,208,185,156,146,136,123,196,174,145,142,132,118,185,162,132,134,124,110,167,145,114],e:"111111111111111111111111111111111111"},
+  "800S200-43":{f:33,v:[181,168,151,263,243,214,171,159,143,247,227,198,163,151,137,234,214,183,157,146,131,224,203,170,151,141,127,214,194,159,143,133,120,198,174,142],e:"001011001111011111011111111111111111"},
+  "800S200-54":{f:50,v:[192,178,161,278,258,232,182,168,152,262,244,215,173,161,145,250,232,202,166,154,139,241,220,192,161,149,134,232,210,184,152,141,127,215,195,165],e:"000000000000000000000000000001000001"},
+  "800S200-68":{f:50,v:[206,191,171,295,274,247,194,180,161,279,258,231,185,171,154,266,247,217,177,164,148,255,236,206,171,159,143,247,226,197,161,150,135,231,210,183]}
+};
+const CEILING_F240 = {
+  "087F125-18":[62,57,49,54,49,43,42,38,33,77,70,61,67,61,50,48,42,34],
+  "087F125-27":[72,65,57,63,57,50,48,44,38,89,81,70,78,70,62,60,54,44],
+  "087F125-30":[74,67,59,65,59,51,50,45,40,91,83,73,80,73,63,62,56,47],
+  "087F125-33":[76,69,61,67,61,53,52,47,41,94,86,75,82,75,65,64,58,49],
+  "087F125-43":[82,75,65,72,65,57,55,50,44,102,92,81,89,81,70,69,62,54],
+  "150F125-18":[95,86,75,83,75,66,64,58,50,117,106,90,102,90,72,68,57,44],
+  "150F125-27":[109,99,87,95,87,76,74,67,58,135,123,107,118,107,94,91,79,64],
+  "150F125-30":[113,102,89,98,89,78,76,69,60,139,126,110,122,110,96,94,84,68],
+  "150F125-33":[116,106,92,102,92,81,78,71,62,144,131,114,126,114,100,97,88,72],
+  "150F125-43":[126,114,100,110,100,87,85,77,67,156,141,123,136,123,108,105,96,80]
+};
+const CEILING_F360 = {
+  "087F125-18":[54,49,43,48,43,38,37,33,29,67,61,53,59,53,47,45,41,34],
+  "087F125-27":[63,57,50,55,50,43,42,38,34,78,70,62,68,62,54,52,48,42],
+  "087F125-30":[65,59,51,56,51,45,44,40,35,80,73,63,70,63,55,54,49,43],
+  "087F125-33":[67,61,53,58,53,46,45,41,36,82,75,65,72,65,57,56,51,44],
+  "087F125-43":[72,65,57,63,57,50,48,44,38,89,81,70,78,70,62,60,54,48],
+  "150F125-18":[83,75,66,72,66,57,56,51,44,102,93,81,89,81,71,68,57,44],
+  "150F125-27":[95,87,76,83,76,66,64,58,51,118,107,94,103,94,82,80,72,63],
+  "150F125-30":[98,89,78,86,78,68,66,60,53,122,110,96,106,96,84,82,75,65],
+  "150F125-33":[102,92,81,89,81,70,69,62,54,126,114,100,110,100,87,85,77,67],
+  "150F125-43":[110,100,87,96,87,76,74,67,59,136,123,108,119,108,94,92,83,73]
+};
+const CEILING_U240 = {
+  "75U050-54":[47,41,37,34,32,41,36,32,30,28,31,28,25,23,21,30,26,24,22,20,58,50,46,43,40,50,44,40,37,34,39,33,28,25,23,37,31,26,24,21],
+  "150U050-54":[66,58,53,49,46,58,51,46,43,41,45,39,36,33,31,43,38,34,31,29,85,74,68,63,59,74,65,59,55,52,58,50,45,40,36,55,48,42,37,33],
+  "200U050-54":[70,61,56,52,49,61,54,49,46,43,48,42,38,36,34,46,40,37,34,32,89,78,71,66,62,78,68,62,58,55,61,53,48,45,42,58,51,46,43,38],
+  "250U050-54":[73,64,58,54,51,64,56,51,48,45,50,44,40,37,35,48,42,38,36,34,93,81,74,69,65,81,71,65,60,57,63,55,51,47,45,60,53,48,45,43]
+};
+const CEILING_U360 = {
+  "75U050-54":[41,36,32,30,28,36,31,28,26,25,28,24,22,20,19,26,23,21,19,18,50,44,40,37,35,44,38,35,32,31,34,30,27,25,23,32,28,26,24,21],
+  "150U050-54":[66,58,53,49,46,58,51,46,43,41,45,39,36,33,31,43,38,34,31,29,85,74,68,63,59,74,65,59,55,52,58,50,45,40,36,55,48,42,37,33],
+  "200U050-54":[70,61,56,52,49,61,54,49,46,43,48,42,38,36,34,46,40,37,34,32,89,78,71,66,62,78,68,62,58,55,61,53,48,45,42,58,51,46,43,38],
+  "250U050-54":[73,64,58,54,51,64,56,51,48,45,50,44,40,37,35,48,42,38,36,34,93,81,74,69,65,81,71,65,60,57,63,55,51,47,45,60,53,48,45,43]
+};
+
+const MANUFACTURERS = [
+  { name:"ClarkDietrich", web:"https://www.clarkdietrich.com", esrStruct:"ESR-1166P" },
+  { name:"CEMCO",         web:"https://cemcosteel.com",        esrStruct:"ESR-1464"  },
+  { name:"Marino\\WARE",  web:"https://www.marinoware.com",    esrStruct:"ESR-2620"  },
+  { name:"Telling Industries", web:"https://tellingindustries.com", esrStruct:"ESR-3957" },
+  { name:"Steeler",       web:"https://www.steeler.com",       esrStruct:"per SSMA"  },
+];
+const DB = {
+  version: "SSMA-VERIFIED r9 · gross-Ix · +10\"/12\" · +ceiling spans · +2-1/2\"/3\" flanges · 2026-09",
+  E: 29500000,
+  depths: [
+    { key:"250", label:'2-1/2"' }, { key:"362", label:'3-5/8"' }, { key:"400", label:'4"' },
+    { key:"600", label:'6"' }, { key:"800", label:'8"' }, { key:"1000", label:'10"' },
+    { key:"1200", label:'12"' },
+  ],
+  flanges: [ { key:"125", label:'1-1/4"', interiorOnly:true }, { key:"137", label:'1-3/8"' }, { key:"162", label:'1-5/8"' }, { key:"200", label:'2"' }, { key:"250", label:'2-1/2"' }, { key:"300", label:'3"' } ],
+  spacings: [12, 16, 24],
+  deflections: [120, 240, 360, 600, 720],
+  wallTypes: [
+    { key:"interior", label:"Interior", long:"Interior non-structural partition", loads:[5, 7.5, 10] },
+    { key:"exterior", label:"Exterior", long:"Exterior structural / curtain wall (wind)", loads:[5, 10, 15, 20, 25, 30, 40, 50] },
+    { key:"ceiling",  label:"Ceiling",  long:"Ceiling / soffit framing (span between supports)", loads:[4, 6, 13] },
+  ],
+  finishes: [
+    { key:"none",   label:"NONE/GYP",  defl:240, note:"Sheathing & lightweight cladding — L/240 typical" },
+    { key:"metal",  label:"ACM/METAL", defl:240, note:"ACM & metal panel systems — L/240 typical (check panel mfr)" },
+    { key:"stucco", label:"STUCCO/EIFS",defl:360, note:"Stucco & EIFS — L/360 to control cracking" },
+    { key:"brick",  label:"BRICK",     defl:600, note:"Brick veneer backup — L/600 per BIA Tech Note 28B" },
+    { key:"stone",  label:"STONE",     defl:720, note:"Adhered/anchored stone — L/720 commonly specified" },
+  ],
+  windExposures: [ { key:"B", kz:0.70 }, { key:"C", kz:0.98 }, { key:"D", kz:1.16 } ],
+  compositeFactor: 1.08,   // representative tested-assembly bonus — interior only, flagged
+  gaugeName: {15:"25ga EQ",18:"25ga",27:"22ga",30:"20ga DW",33:"20ga ST",43:"18ga",54:"16ga",68:"14ga",97:"12ga",118:"10ga"},
+  eqGaugeName: {15:"25ga EQ",18:"20ga EQ"},
+  // Ceiling / soffit framing, SSMA Product Technical Guide pp.61-69.
+  ceilApps: [
+    { key:"interior", label:"Interior", loads:[4, 6, 13], note:"interior ceilings and soffits" },
+    { key:"exterior", label:"Exterior", loads:[20, 25, 30, 35, 40, 50], note:"exterior soffits under wind pressure" },
+  ],
+  ceilSystems: [
+    { key:"joist",   label:"S-JOIST",  long:"C-stud used as ceiling/soffit joist", spacings:[12,16,24] },
+    { key:"furring", label:"HAT FURR", long:"Hat (furring) channel, F-section",     spacings:[12,16,24] },
+    { key:"channel", label:"CRC / U",  long:"Cold-rolled U-channel",               spacings:[24,36,48,60,72] },
+  ],
+  ceilDeflections: [240, 360],
+  // S-sections are rated with the compression flange unbraced or braced at
+  // midspan; F and U sections are rated as single or multiple continuous spans.
+  ceilBraces: [ { key:"unbraced", label:"UNBRACED" }, { key:"midspan", label:"MIDSPAN BRACED" } ],
+  ceilRuns:   [ { key:"single",   label:"SINGLE SPAN" }, { key:"multiple", label:"MULTI SPAN" } ],
+};
+const SOURCES = [
+  { name:"SSMA Product Technical Guide — Section Properties + Limiting Heights", role:"The verified backbone: section properties (pp.7–12) AND the published Curtain Wall / Interior limiting-height tables (pp.19–30) that the engine reproduces cell-for-cell",
+    links:[ {label:"LOCAL PDF — LIMITING HEIGHTS", url:"sources/SSMA_LIMITING_HEIGHTS_official.pdf"},
+            {label:"LOCAL PDF — SECTION PROPS", url:"sources/SSMA_Product_Technical_Guide.pdf"},
+            {label:"SSMA.COM ORIGINAL", url:"https://ssma.com/wp-content/uploads/2021/02/SSMA_Product_Technical_Guide_11-13-17-1.3.pdf"} ] },
+  { name:"Steel-Con 362S162-43 Submittal Sheet", role:"Independent cross-check: engine reproduces its published limiting heights exactly, incl. the 0.70 wind-deflection provision",
+    links:[ {label:"LOCAL PDF (SAVED COPY)", url:"sources/SteelCon_362S162-43_Submittal.pdf"} ] },
+  { name:"ClarkDietrich ProSTUD®", role:"Proprietary EQ drywall line (ESR-3064P) — EQ rows are estimates; verify here",
+    links:[ {label:"PRODUCT CATALOG (PDF)", url:"https://www.clarkdietrich.com/sites/default/files/media/documents/CD_ProSTUD_Catalog.pdf"},
+            {label:"INTERACTIVE LIMITING HEIGHTS", url:"https://www.itools.clarkdietrich.com/prostud_limiting_heights.php"} ] },
+  { name:"CEMCO / Marino\\WARE ViperStud®", role:"Proprietary EQ drywall line (ESR-2620, sister companies) — EQ rows are estimates; verify here",
+    links:[ {label:"VIPERSTUD CATALOG (PDF)", url:"https://cemcosteel.com/app/uploads/2020/04/ViperStud-Catalog.pdf"},
+            {label:"ICC-ES ESR-2620 (PDF)", url:"https://cemcosteel.com/app/uploads/2020/04/ICC-ESR-2620_ViperStud_unlocked.pdf"} ] },
+  { name:"Telling Industries", role:"SSMA member — standard sections match SSMA data in this app",
+    links:[ {label:"TELLINGINDUSTRIES.COM", url:"https://tellingindustries.com"} ] },
+  { name:"Steeler", role:"SSMA member — standard sections match SSMA data in this app",
+    links:[ {label:"STEELER.COM", url:"https://www.steeler.com"} ] },
+];
+
+/* ----- build runtime member lists from the verified tables ----- */
+function structuralMembers(depth, flange){
+  const t = (SSMA_STRUCTURAL[depth]||{})[flange]; if (!t) return [];
+  return Object.entries(t).map(([mil,[ix,ma,fy]])=>{
+    const desig = `${depth}S${flange}-${mil}`;
+    return {
+      desig, depth, flange, mil:+mil, ix, ma, fy,
+      ga:DB.gaugeName[+mil],
+      // Section properties are SSMA-published for every member here, but only
+      // S137/S162/S200 flanges up to 8" webs appear in a published wall height
+      // table. 10"/12" webs and 2-1/2"/3" flanges are computed, so they never
+      // wear the plain verified chip.
+      verified: !isCalcOnly(depth, flange),
+      calc: isCalcOnly(depth, flange),
+      endStiff: WEB_STIFFENER_REQ.has(desig),
+    };
+  }).sort((a,b)=>a.mil-b.mil);
+}
+function nonstructuralMembers(depth, composite){
+  const t = SSMA_NONSTRUCTURAL[depth]||{};
+  const list = Object.entries(t).map(([mil,[ix,ma]])=>({
+    desig:`${depth}S125-${mil}`, depth, flange:"125", mil:+mil, ix, ma, fy:33,
+    ga:DB.gaugeName[+mil], verified:true
+  }));
+  if (composite && COMPOSITE_ONLY[depth]) list.push(...COMPOSITE_ONLY[depth]);
+  return list.sort((a,b)=>a.mil-b.mil);
+}
+// Company (in-house) codes for the 18-mil 20ga EQ studs, per estimating dept convention
+const COMPANY_ALIAS_20EQ = { "250":"250S", "362":"35820S", "400":"420S", "600":"620S" };
+function eqMembers(line, depth){
+  const t = line.members[depth]||{};
+  return Object.entries(t).map(([mil,[ix,ma,fy]])=>({
+    desig:`${depth}${line.code}125-${mil}`, depth, flange:"125", mil:+mil, ix, ma, fy,
+    ga:DB.eqGaugeName[+mil], eq:true, est:true,
+    alias: +mil===18 ? COMPANY_ALIAS_20EQ[depth] : undefined
+  })).sort((a,b)=>a.mil-b.mil);
+}
+
+/* ----- ceiling / soffit members, built from the published span tables ----- */
+// U-channels carry a 15 psf column the S and F tables do not publish.
+const CEIL_U_LOADS = [4, 6, 13, 15];
+function ceilSTable(app, defl){
+  return app === "interior"
+    ? (defl === 360 ? CEILING_S_INT360 : CEILING_S_INT240)
+    : (defl === 360 ? CEILING_S_EXT360 : CEILING_S_EXT240);
+}
+function ceilSystem(key){ return DB.ceilSystems.find(s=>s.key===key); }
+function ceilLoads(c){
+  if (c.ceilSystem === "channel") return CEIL_U_LOADS;
+  if (c.ceilSystem === "furring") return [4, 6, 13];   // F-sections: interior only
+  return DB.ceilApps.find(a=>a.key===c.ceilApp).loads;
+}
+// The published table for the current system: keys are designations.
+function ceilRawTable(c){
+  if (c.ceilSystem === "furring") return c.defl===360 ? CEILING_F360 : CEILING_F240;
+  if (c.ceilSystem === "channel") return c.defl===360 ? CEILING_U360 : CEILING_U240;
+  return ceilSTable(c.ceilApp, c.defl);
+}
+// Web depths this system actually publishes, in inches-hundredths order.
+function ceilDepths(c){
+  const seen = new Set();
+  for (const desig of Object.keys(ceilRawTable(c))) seen.add(desig.split(/[SFU]/)[0]);
+  return [...seen].sort((a,b)=>+a-+b);
+}
+function ceilFlanges(c, depth){
+  const seen = new Set();
+  for (const desig of Object.keys(ceilRawTable(c))){
+    const m = desig.match(/^(\d+)[SFU](\d+)-/);
+    if (m && m[1]===depth) seen.add(m[2]);
+  }
+  return [...seen].sort((a,b)=>+a-+b);
+}
+function ceilDepthLabel(depth){
+  const hit = DB.depths.find(d=>d.key===depth);
+  if (hit) return hit.label;
+  const CEIL_LABELS = { "087":'7/8"', "150":'1-1/2"', "162":'1-5/8"', "350":'3-1/2"',
+                        "75":'3/4"', "200":'2"', "250":'2-1/2"' };
+  return CEIL_LABELS[depth] || (+depth/100)+'"';
+}
+function ceilingMembers(c){
+  const tbl = ceilRawTable(c);
+  const kind = c.ceilSystem === "joist" ? "S" : (c.ceilSystem === "furring" ? "F" : "U");
+  const out = [];
+  for (const [desig, row] of Object.entries(tbl)){
+    const m = desig.match(/^(\d+)([SFU])(\d+)-(\d+)$/);
+    if (!m || m[2] !== kind) continue;
+    const [, depth, , flange, mil] = m;
+    if (depth !== c.depth) continue;
+    if (kind === "S" && flange !== c.flange) continue;
+    out.push({
+      desig, depth, flange, mil:+mil,
+      fy: kind === "S" ? row.f : 33,
+      ga: DB.gaugeName[+mil] || `${mil} mil`,
+      ceil:true, ceilKind:kind, verified:true,
+      cells: kind === "S" ? row.v : row,
+      eflags: kind === "S" ? (row.e || null) : null,
+    });
+  }
+  return out.sort((a,b)=>a.mil-b.mil);
+}
+
+/* ================================================================
+   2. ENGINE — AISI S100 simple span, uniform lateral load.
+   Validated: 362S162-43 → 19'-1" @5psf/16"/L240; 14'-11" @15psf
+   w/ 0.70 deflection reduction; 362S125-18 → 12'-2" (strength
+   governed) — all exact matches to published tables.
+   ================================================================ */
+const Engine = {
+  loadPerInch(psf, spacingIn){ return psf * spacingIn / 144; },
+  // Ceiling / soffit spans are a direct lookup of the SSMA published tables.
+  // Nothing is computed or interpolated: a cell SSMA does not publish reads N/R.
+  ceilingSpan(m, c){
+    const loads = ceilLoads(c);
+    const li = loads.indexOf(c.psf);
+    const sp = ceilSystem(c.ceilSystem).spacings;
+    const si = sp.indexOf(c.spacing);
+    if (li < 0 || si < 0) return { inches:0, governs:"NOT TABULATED", nr:true };
+    let idx, label;
+    if (m.ceilKind === "S"){
+      const braced = c.ceilBrace === "midspan";
+      idx = li*6 + (braced?3:0) + si;
+      label = braced ? "SSMA TABLE · MIDSPAN BRACED" : "SSMA TABLE · UNBRACED";
+    } else {
+      const per = sp.length, multi = c.ceilRun === "multiple";
+      idx = (multi ? per*loads.length : 0) + li*per + si;
+      label = multi ? "SSMA TABLE · MULTI SPAN" : "SSMA TABLE · SINGLE SPAN";
+    }
+    const v = m.cells[idx];
+    if (v === undefined) return { inches:0, governs:"NOT TABULATED", nr:true };
+    const needsStiff = !!(m.eflags && m.eflags[idx] === "1");
+    return { inches:v, governs:label, deflH:v, strH:v, endStiff:needsStiff };
+  },
+  limitingHeight(m, c){
+    if (c.wallType === "ceiling") return this.ceilingSpan(m, c);
+    // Composite-only members: direct lookup of the SSMA-published composite table
+    if (m.table){
+      const sp = m.table[String(c.spacing)];
+      const di = ({120:0, 240:1, 360:2})[c.defl];
+      const v = (sp && di!==undefined && sp[String(c.psf)]) ? sp[String(c.psf)][di] : null;
+      return { inches:v||0, governs: v ? "SSMA COMPOSITE TABLE" : "NOT RATED HERE", deflH:v||0, strH:v||0, nr:!v };
+    }
+    const w = this.loadPerInch(c.psf, c.spacing);
+    // SSMA table note / IBC 1604.3: deflection may be checked at 0.7×W for WIND only.
+    // The 5 psf lateral case is never reduced (matches SSMA Curtain Wall table footnote).
+    const wD = (c.wallType==="exterior" && c.windReduction && c.psf > 5) ? w*0.70 : w;
+    let ld = Math.cbrt(384 * DB.E * m.ix / (5 * wD * c.defl));
+    let ls = Math.sqrt(8 * m.ma / w);
+    // Composite action is only a published/tested property for S125 drywall studs.
+    // It does NOT apply to structural (S137/S162/S200) studs — SSMA has no such table.
+    if (c.wallType==="interior" && c.composite && m.flange==="125"){ ld*=DB.compositeFactor; ls*=DB.compositeFactor; }
+    const h = Math.min(ld, ls);
+    // SSMA-published tables round to the nearest inch — match that convention
+    return { inches: Math.round(h), governs: ld<=ls ? "DEFLECTION":"STRENGTH", deflH:Math.round(ld), strH:Math.round(ls) };
+  },
+  // Simplified ASCE 7 components & cladding wall pressure (zone 4, h≤30 ft), ASD level
+  windPsf(V, expKey){
+    const kz = DB.windExposures.find(e=>e.key===expKey).kz;
+    const p = 0.6 * 0.00256 * kz * 0.85 /*Kd*/ * 1.18 /*|GCp|+GCpi*/ * V * V;
+    return Math.round(p*10)/10;
+  }
+};
+const fmtFtIn = ins => `${Math.floor(ins/12)}'-${ins%12}"`;
+
+/* ================================================================
+   3. STATE
+   ================================================================ */
+const state = {
+  wallType:"interior", targetIn:168, depth:"362", flange:"125", spacing:16,
+  psf:5, psfSource:"preset", defl:240, composite:false,
+  windV:115, windExp:"B", windReduction:true, finish:"none",
+  // ceiling / soffit mode
+  ceilApp:"interior", ceilSystem:"joist", ceilBrace:"unbraced", ceilRun:"single",
+  selected:null  // { famId, desig }
+};
+const activeWallType = () => DB.wallTypes.find(w=>w.key===state.wallType);
+const activeLoads = () =>
+  state.wallType === "ceiling" ? ceilLoads(state) : activeWallType().loads;
+const activeSpacings = () =>
+  state.wallType === "ceiling" ? ceilSystem(state.ceilSystem).spacings : DB.spacings;
+const activeDepths = () =>
+  state.wallType === "ceiling"
+    ? ceilDepths(state).map(k=>({ key:k, label:ceilDepthLabel(k) }))
+    : DB.depths;
+// Keep depth / flange / spacing / load legal after any mode or system change.
+function reconcileCeiling(){
+  const depths = ceilDepths(state);
+  if (!depths.includes(state.depth)) state.depth = depths.includes("362") ? "362" : depths[0];
+  const flanges = ceilFlanges(state, state.depth);
+  if (flanges.length && !flanges.includes(state.flange))
+    state.flange = flanges.includes("162") ? "162" : flanges[0];
+  const sp = ceilSystem(state.ceilSystem).spacings;
+  if (!sp.includes(state.spacing)) state.spacing = sp.includes(16) ? 16 : sp[0];
+  const loads = ceilLoads(state);
+  if (!loads.includes(state.psf)) state.psf = loads[0];
+  state.psfSource = "preset";
+  if (!DB.ceilDeflections.includes(state.defl)) state.defl = 240;
+}
+// Coming back out of ceiling mode, depth/flange/spacing may hold F- or
+// U-section values that mean nothing to a wall. Put them back on the wall grid.
+function reconcileWall(){
+  if (!DB.depths.some(d=>d.key===state.depth)) state.depth = "362";
+  const drywallHere = state.wallType==="interior" && !!SSMA_NONSTRUCTURAL[state.depth];
+  const legal = state.flange==="125"
+    ? drywallHere
+    : !!(SSMA_STRUCTURAL[state.depth]||{})[state.flange];
+  if (!legal){
+    // interior work is drywall-flange by default, but only where SSMA rates one
+    state.flange = drywallHere ? "125"
+                 : ((SSMA_STRUCTURAL[state.depth]||{})["162"] ? "162" : "200");
+  }
+  if (!DB.spacings.includes(state.spacing)) state.spacing = 16;
+  if (!DB.deflections.includes(state.defl)) state.defl = 240;
+}
+/* ================================================================
+   VALIDATION HARNESS — engine output vs values transcribed straight
+   from the SSMA "Curtain Wall Limiting Heights — Single Span" tables
+   (sources/SSMA_LIMITING_HEIGHTS_official.pdf, pp.25–30). Each row:
+   [desig, depth, flange, mil, psf, spacing, defl, publishedFtIn].
+   Spans every depth (250–800), every flange (137/162/200), every
+   gauge (33–97 mil), 5 psf + wind loads, all three spacings.
+   ================================================================ */
+const SSMA_ANCHORS = [
+  // 5 psf column (no wind reduction)
+  ["362S137-43","362","137",43, 5,16,240,"18'-3\""], ["362S137-43","362","137",43, 5,24,360,"13'-11\""],
+  ["362S162-43","362","162",43, 5,12,240,"21'-0\""], ["362S162-43","362","162",43, 5,16,240,"19'-1\""], ["362S162-43","362","162",43, 5,24,120,"21'-0\""],
+  ["362S162-54","362","162",54, 5,16,240,"20'-6\""], ["362S162-68","362","162",68, 5,16,120,"27'-7\""],
+  ["362S200-43","362","200",43, 5,16,240,"20'-2\""], ["362S200-54","362","200",54, 5,16,240,"21'-8\""],
+  ["400S137-43","400","137",43, 5,16,240,"19'-8\""], ["400S162-43","400","162",43, 5,16,240,"20'-7\""],
+  ["400S162-54","400","162",54, 5,16,240,"22'-1\""], ["400S200-54","400","200",54, 5,16,240,"23'-4\""],
+  ["600S162-43","600","162",43, 5,16,240,"28'-4\""], ["600S162-43","600","162",43, 5,24,240,"24'-9\""],
+  ["600S162-54","600","162",54, 5,16,240,"30'-5\""], ["600S162-68","600","162",68, 5,16,240,"32'-7\""],
+  ["600S137-97","600","137",97, 5,16,240,"34'-6\""], ["600S162-97","600","162",97, 5,16,240,"36'-2\""],
+  ["600S200-68","600","200",68, 5,16,240,"34'-3\""], ["600S200-97","600","200",97, 5,16,240,"38'-1\""],
+  ["800S137-43","800","137",43, 5,16,120,"39'-9\""], ["800S162-43","800","162",43, 5,16,240,"35'-8\""],
+  ["800S162-54","800","162",54, 5,16,240,"38'-4\""], ["800S137-54","800","137",54, 5,16,240,"36'-11\""],
+  ["800S200-43","800","200",43, 5,16,120,"45'-10\""],
+  // wind loads (0.70 deflection reduction)
+  ["362S162-43","362","162",43, 15,16,240,"14'-11\""], ["362S162-43","362","162",43, 15,12,240,"16'-5\""],
+  ["362S162-43","362","162",43, 30,16,360,"10'-4\""], ["362S162-54","362","162",54, 15,16,240,"16'-0\""],
+  ["400S162-43","400","162",43, 15,16,240,"16'-1\""], ["600S162-43","600","162",43, 15,12,240,"24'-4\""],
+];
+function runValidation(){
+  return SSMA_ANCHORS.map(([desig,d,f,mil,psf,sp,defl,exp])=>{
+    const m = structuralMembers(d,f).find(x=>x.mil===mil);
+    const got = m ? fmtFtIn(Engine.limitingHeight(m,{wallType:"exterior",psf,spacing:sp,defl,windReduction:true}).inches) : "—";
+    // parse to inches for tolerance
+    const toIn = s=>{ const mm=s.match(/(\d+)'-(\d+)/); return mm?(+mm[1])*12+(+mm[2]):NaN; };
+    const diff = Math.abs(toIn(got)-toIn(exp));
+    return { desig, cond:`${psf}psf/${sp}"/L${defl}`, got, exp, diff, ok: diff<=1 };
+  });
+}
+/* Ceiling/soffit data is transcribed straight from the published tables, so it
+   cannot be checked against the engine. Instead it is checked against physics:
+   these relations must hold in every published cell, and a transcription slip
+   almost always breaks one of them. */
+function runCeilingValidation(){
+  const bad = [];
+  const TABLES = [
+    ["INTERIOR L/240", CEILING_S_INT240, [4,6,13]],
+    ["INTERIOR L/360", CEILING_S_INT360, [4,6,13]],
+    ["EXTERIOR L/240", CEILING_S_EXT240, [20,25,30,35,40,50]],
+    ["EXTERIOR L/360", CEILING_S_EXT360, [20,25,30,35,40,50]],
+  ];
+  let cells = 0;
+  for (const [label, tbl, loads] of TABLES){
+    for (const [desig, row] of Object.entries(tbl)){
+      const v = row.v;
+      cells += v.length;
+      for (let li=0; li<loads.length; li++){
+        for (const off of [0,3]){
+          const t = [v[li*6+off], v[li*6+off+1], v[li*6+off+2]];
+          if (!(t[0]>=t[1] && t[1]>=t[2]))
+            bad.push(`${label} ${desig} @ ${loads[li]} psf: span rises with spacing (${t})`);
+        }
+        for (let k=0;k<3;k++)
+          if (v[li*6+3+k] < v[li*6+k])
+            bad.push(`${label} ${desig} @ ${loads[li]} psf: midspan-braced shorter than unbraced`);
+      }
+      for (let li=1; li<loads.length; li++)
+        for (let k=0;k<6;k++)
+          if (v[li*6+k] > v[(li-1)*6+k])
+            bad.push(`${label} ${desig}: span grows from ${loads[li-1]} to ${loads[li]} psf`);
+    }
+  }
+  // a tighter deflection limit can never allow a longer span
+  for (const [a,b,label] of [[CEILING_S_INT240,CEILING_S_INT360,"INTERIOR"],
+                             [CEILING_S_EXT240,CEILING_S_EXT360,"EXTERIOR"]])
+    for (const desig of Object.keys(a))
+      if (b[desig]) a[desig].v.forEach((x,i)=>{
+        if (b[desig].v[i] > x) bad.push(`${label} ${desig}: L/360 exceeds L/240 at cell ${i}`);
+      });
+  return { cells, bad };
+}
+/* Section-property sanity. Widening a flange at the same depth and thickness adds
+   gross Ix, and a thicker gauge adds both Ix and Ma. Ma is deliberately NOT required
+   to rise with flange width: SSMA's own tables show local and distortional buckling
+   pulling Ma down on some wide-flange rows (e.g. 362S300-97 vs 362S250-97). A digit
+   slip in a transcribed Ix or Ma almost always breaks one of the enforced orderings. */
+function runSectionChecks(){
+  const bad = [], order = ["137","162","200","250","300"];
+  let members = 0;
+  for (const [depth, fl] of Object.entries(SSMA_STRUCTURAL)){
+    for (const [f, ms] of Object.entries(fl)){
+      const mils = Object.keys(ms).map(Number).sort((a,b)=>a-b);
+      members += mils.length;
+      for (let i=1;i<mils.length;i++){
+        const a=ms[mils[i-1]], b=ms[mils[i]];
+        if (b[0]<=a[0]) bad.push(`${depth}S${f}: Ix does not rise from ${mils[i-1]} to ${mils[i]} mil`);
+        if (b[1]<=a[1]) bad.push(`${depth}S${f}: Ma does not rise from ${mils[i-1]} to ${mils[i]} mil`);
+      }
+    }
+    for (let i=1;i<order.length;i++){
+      const a=fl[order[i-1]], b=fl[order[i]]; if (!a||!b) continue;
+      for (const mil of Object.keys(b)){
+        if (!a[mil]) continue;
+        if (b[mil][0]<a[mil][0]) bad.push(`${depth}S${order[i]}-${mil}: Ix below the narrower ${order[i-1]} flange`);
+      }
+    }
+  }
+  return { members, bad };
+}
+function updateWindOut(){
+  const wp = Engine.windPsf(state.windV, state.windExp);
+  $("windOut").innerHTML = `V<sub>ult</sub> ${state.windV} mph · Exp ${state.windExp} → C&C wall zone ≈ <b>${wp} psf</b> (ASD, 0.6W)<br>simplified ASCE 7, h ≤ 30 ft — confirm w/ EOR for final`;
+}
+
+/* ================================================================
+   4. QUERY LAYER — family blocks for the current criteria
+   ================================================================ */
+function familiesFor(c){
+  const fams = [];
+  const ssmaLinks = [{label:"LOCAL SSMA PDF", url:"sources/SSMA_Product_Technical_Guide.pdf"},{label:"SSMA.COM", url:"https://ssma.com/wp-content/uploads/2021/02/SSMA_Product_Technical_Guide_11-13-17-1.3.pdf"}];
+  if (c.wallType==="ceiling"){
+    const sys = ceilSystem(c.ceilSystem);
+    const app = DB.ceilApps.find(a=>a.key===c.ceilApp);
+    const PAGES = { joist: c.ceilApp==="interior" ? "pp.62-63" : "pp.64-67",
+                    furring:"p.68", channel:"p.69" };
+    const cond = c.ceilSystem==="joist"
+      ? (c.ceilBrace==="midspan" ? "compression flange braced at midspan" : "compression flange unbraced")
+      : (c.ceilRun==="multiple" ? "two or more equal continuous spans" : "single span");
+    fams.push({
+      famId:"ssma-ceiling-"+c.ceilSystem,
+      name:`SSMA Allowable Ceiling / Soffit Spans — ${sys.long}`,
+      sub:`${app.label} ${app.note} · ${cond} · simple span · published table ${PAGES[c.ceilSystem]}`,
+      esr:"SSMA Ceiling/Soffit Span Tables", verified:true, ceiling:true,
+      links:ssmaLinks,
+      members: ceilingMembers(c),
+    });
+    return fams;
+  }
+  if (c.wallType==="interior"){
+    // Structural flange chosen for interior framing (tall partitions, shafts,
+    // above-ceiling walls): show the SSMA structural ladder at interior loads.
+    if (c.flange!=="125"){
+      const fl = DB.flanges.find(f=>f.key===c.flange).label;
+      fams.push({ famId:"ssma-int-struct", name:`SSMA Structural Studs (S${c.flange}) — Interior Application`,
+        sub:`${fl} flange · 33 ksi (33/43 mil) / 50 ksi (54–97 mil) · tall-partition workhorses · all five manufacturers`,
+        esr:"SSMA Product Technical Guide", verified:true,
+        links:[...ssmaLinks, {label:"CROSS-CHECK SUBMITTAL PDF", url:"sources/SteelCon_362S162-43_Submittal.pdf"}],
+        members: structuralMembers(c.depth, c.flange) });
+      return fams;
+    }
+    // Reference block: the SSMA-standard S125 ladder on its own (verified data,
+    // identical from every maker), followed by one block per manufacturer.
+    fams.push({ famId:"ssma-int", name:"SSMA Standard Drywall Studs (S125)", sub:'1-1/4" flange · 33 ksi · industry-standard sections — identical from all five manufacturers',
+      esr:"SSMA Product Technical Guide", verified:true, links:ssmaLinks,
+      members: nonstructuralMembers(c.depth, c.composite) });
+    // Per-manufacturer blocks: their proprietary EQ ladder (estimates) on top of
+    // the standard SSMA S125 ladder.
+    for (const m of MANUFACTURERS){
+      const line = EQ_LINES.find(l=>l.mfr===m.name);
+      const eq = line ? eqMembers(line, c.depth) : [];
+      const std = nonstructuralMembers(c.depth, c.composite);
+      const members = [...eq, ...std].sort((a,b)=> a.mil-b.mil || a.fy-b.fy);
+      const links = line
+        ? [{label:"EQ CATALOG / SOURCE ↗", url:line.web}, ...(line.web2?[{label:line.web2.label+" ↗", url:line.web2.url}]:[]), ...ssmaLinks]
+        : [{label:(m.name.toUpperCase())+" ↗", url:m.web}, ...ssmaLinks];
+      fams.push({
+        famId:"int-"+m.name.replace(/\W+/g,"").toLowerCase(),
+        name: m.name + (line ? ` — ${line.name.replace(" Drywall Framing","")} + Standard S125` : " — Standard S125 Drywall Studs"),
+        sub: line ? `1-1/4" flange · EQ rows = high-strength proprietary (${line.anchor})` : '1-1/4" flange · standard SSMA sections (no EQ line in dataset — check supplier)',
+        esr: line ? line.esr : "SSMA Product Technical Guide",
+        mixed: !!line, verified: !line, links, members
+      });
+    }
+  } else {
+    fams.push({ famId:"ssma-ext", name:"SSMA Standard Structural Studs", sub:`${DB.flanges.find(f=>f.key===c.flange).label} flange · 33 ksi (33/43 mil) / 50 ksi (54–97 mil) · all five manufacturers`,
+      esr:"SSMA Curtain Wall Limiting Heights", verified:true,
+      links:[{label:"LOCAL SSMA PDF (LIMITING HEIGHTS)", url:"sources/SSMA_LIMITING_HEIGHTS_official.pdf"},{label:"SECTION PROPERTIES PDF", url:"sources/SSMA_Product_Technical_Guide.pdf"},{label:"CROSS-CHECK SUBMITTAL", url:"sources/SteelCon_362S162-43_Submittal.pdf"}],
+      members: structuralMembers(c.depth, c.flange) });
+  }
+  return fams;
+}
+function evaluateMatrix(c = state){
+  return familiesFor(c).map(fam=>{
+    const rows = fam.members.map(m=>{
+      const r = Engine.limitingHeight(m, c);
+      return { fam, member:m, ...r, pass:r.inches >= c.targetIn };
+    }).sort((a,b)=>a.member.mil-b.member.mil);
+    return { fam, rows, pick: rows.find(r=>r.pass)||null };
+  });
+}
+function globalBestPick(results){
+  const picks = results.map(r=>r.pick).filter(Boolean);
+  if (!picks.length) return null;
+  return picks.sort((a,b)=> a.member.mil-b.member.mil || b.inches-a.inches)[0];
+}
+
+/* ================================================================
+   5. INPUT PANEL
+   ================================================================ */
+const $ = id => document.getElementById(id);
+function buildSeg(el, items, getKey, getLabel, onPick){
+  el.innerHTML = "";
+  items.forEach(item=>{
+    const b = document.createElement("button");
+    b.textContent = getLabel(item); b.dataset.key = getKey(item);
+    b.onclick = ()=> onPick(item); el.appendChild(b);
+  });
+}
+function syncSeg(el, key){ [...el.children].forEach(b=> b.classList.toggle("on", b.dataset.key===String(key))); }
+function rebuildLoadSeg(){
+  buildSeg($("loadSeg"), activeLoads(), l=>l, l=>`${l} PSF`, l=>{ state.psf=l; state.psfSource="preset"; renderAll(); });
+}
+function rebuildFlangeSeg(){
+  let items;
+  if (state.wallType==="ceiling"){
+    items = ceilFlanges(state, state.depth).map(k=>({ key:k, label:ceilDepthLabel(k) }));
+  } else {
+    items = DB.flanges.filter(f=> state.wallType==="interior" || !f.interiorOnly)
+      // only offer flanges SSMA actually publishes at this depth: the S125
+      // drywall ladder stops at 8", and 10"/12" have no 1-3/8" flange
+      .filter(f=> f.key==="125"
+                ? (state.wallType==="interior" && !!SSMA_NONSTRUCTURAL[state.depth])
+                : !!(SSMA_STRUCTURAL[state.depth]||{})[f.key]);
+  }
+  buildSeg($("flangeSeg"), items, f=>f.key, f=>f.label, f=>{ state.flange=f.key; state.selected=null; renderAll(); });
+}
+function rebuildDepthSeg(){
+  buildSeg($("depthSeg"), activeDepths(), d=>d.key, d=>d.label, d=>{
+    state.depth=d.key; state.selected=null;
+    // 10"/12" have no 1-3/8" flange and no S125 drywall ladder, so the flange
+    // selection may no longer be legal at the new depth
+    if (state.wallType==="ceiling") reconcileCeiling(); else reconcileWall();
+    rebuildFlangeSeg(); renderAll();
+  });
+}
+function rebuildSpacingSeg(){
+  buildSeg($("spacingSeg"), activeSpacings(), s=>s, s=>`${s}" OC`, s=>{ state.spacing=s; renderAll(); });
+}
+function rebuildCeilBraceSeg(){
+  const isJoist = state.ceilSystem==="joist";
+  const items = isJoist ? DB.ceilBraces : DB.ceilRuns;
+  buildSeg($("ceilBraceSeg"), items, b=>b.key, b=>b.label, b=>{
+    if (isJoist) state.ceilBrace=b.key; else state.ceilRun=b.key;
+    renderAll();
+  });
+}
+function rebuildDeflSeg(){
+  const items = state.wallType==="ceiling" ? DB.ceilDeflections : DB.deflections;
+  buildSeg($("deflSeg"), items, d=>d, d=>`L/${d}`, d=>{ state.defl=d; renderAll(); });
+}
+function initControls(){
+  buildSeg($("wallSeg"), DB.wallTypes, w=>w.key, w=>w.label.toUpperCase(), w=>{
+    state.wallType = w.key;
+    if (w.key==="exterior"){ state.composite=false; reconcileWall(); if (state.flange==="125") state.flange="162"; if (state.psfSource==="preset" && !activeLoads().includes(state.psf)) state.psf=15; }
+    else if (w.key==="ceiling"){ state.composite=false; reconcileCeiling(); }
+    else { state.psfSource="preset"; state.defl=240; reconcileWall(); if (!activeLoads().includes(state.psf)) state.psf=5; }
+    state.selected=null;
+    rebuildDepthSeg(); rebuildFlangeSeg(); rebuildSpacingSeg();
+    rebuildLoadSeg(); rebuildDeflSeg(); rebuildCeilBraceSeg(); renderAll();
+  });
+  buildSeg($("ceilAppSeg"), DB.ceilApps, a=>a.key, a=>a.label.toUpperCase(), a=>{
+    state.ceilApp=a.key; state.selected=null; reconcileCeiling();
+    rebuildDepthSeg(); rebuildFlangeSeg(); rebuildLoadSeg(); renderAll();
+  });
+  buildSeg($("ceilSysSeg"), DB.ceilSystems, s=>s.key, s=>s.label, s=>{
+    state.ceilSystem=s.key; state.selected=null; reconcileCeiling();
+    rebuildDepthSeg(); rebuildFlangeSeg(); rebuildSpacingSeg();
+    rebuildLoadSeg(); rebuildCeilBraceSeg(); renderAll();
+  });
+  rebuildDepthSeg();
+  rebuildFlangeSeg();
+  rebuildSpacingSeg();
+  rebuildLoadSeg();
+  rebuildDeflSeg();
+  rebuildCeilBraceSeg();
+  buildSeg($("finishSeg"), DB.finishes, f=>f.key, f=>f.label, f=>{
+    state.finish=f.key; state.defl=f.defl; renderAll();
+  });
+  buildSeg($("windExpSeg"), DB.windExposures, e=>e.key, e=>e.key, e=>{ state.windExp=e.key; renderAll(false); });
+
+  const slider = $("heightSlider");
+  slider.addEventListener("input", ()=>{ state.targetIn=+slider.value; renderAll(); });
+  $("ftInput").addEventListener("input", e=>{
+    const ft = Math.max(8, Math.min(40, +e.target.value||8));
+    state.targetIn = ft*12 + (+$("inInput").value||0); renderAll(false);
+  });
+  $("inInput").addEventListener("input", e=>{
+    const i = Math.max(0, Math.min(11, +e.target.value||0));
+    state.targetIn = (+$("ftInput").value||14)*12 + i; renderAll(false);
+  });
+  $("compToggle").addEventListener("click", ()=>{ state.composite=!state.composite; renderAll(); });
+  $("windRedToggle").addEventListener("click", ()=>{ state.windReduction=!state.windReduction; renderAll(); });
+  // Free typing: store the raw value, don't clamp or rewrite the field mid-type.
+  $("windV").addEventListener("input", e=>{
+    const v = parseFloat(e.target.value);
+    if (!isNaN(v)) state.windV = v;
+    updateWindOut();
+  });
+  // Clamp only when the user leaves the field.
+  $("windV").addEventListener("blur", e=>{
+    let v = parseFloat(e.target.value);
+    if (isNaN(v)) v = 115;
+    state.windV = Math.max(50, Math.min(250, v));
+    e.target.value = state.windV; updateWindOut();
+  });
+  $("windApply").addEventListener("click", ()=>{ state.psf=Engine.windPsf(state.windV,state.windExp); state.psfSource="wind"; renderAll(); });
+  $("qcHead").addEventListener("click", ()=>{ $("qcBlock").classList.toggle("open"); });
+  $("dbStamp").textContent = DB.version;
+
+  // header buttons + modals
+  $("btnTheme").addEventListener("click", ()=>{
+    document.body.classList.toggle("light");
+    localStorage.setItem("terminus-theme", document.body.classList.contains("light")?"light":"dark");
+  });
+  if (localStorage.getItem("terminus-theme")==="light") document.body.classList.add("light");
+  $("btnGuide").addEventListener("click", ()=>openGuide());
+  $("btnSources").addEventListener("click", ()=>{ renderSources(); $("srcVeil").classList.add("show"); });
+  $("btnValidate").addEventListener("click", ()=>{ renderValidation(); $("valVeil").classList.add("show"); });
+  document.querySelectorAll("[data-close]").forEach(b=> b.addEventListener("click", ()=> $(b.dataset.close).classList.remove("show")));
+  document.querySelectorAll(".modal-veil").forEach(v=> v.addEventListener("click", e=>{ if (e.target===v) v.classList.remove("show"); }));
+  document.querySelectorAll(".qm").forEach(q=> q.addEventListener("click", ()=>openGuide(q.dataset.g)));
+}
+function renderInputs(syncNumbers=true){
+  const ft = Math.floor(state.targetIn/12), inch = state.targetIn%12;
+  $("hrFt").textContent=ft; $("hrIn").textContent=inch;
+  const slider=$("heightSlider");
+  slider.value=state.targetIn;
+  slider.style.setProperty("--fill", ((state.targetIn-96)/(480-96)*100)+"%");
+  if (syncNumbers){ $("ftInput").value=ft; $("inInput").value=inch; }
+
+  const ext = state.wallType==="exterior";
+  const ceil = state.wallType==="ceiling";
+  const wt = activeWallType();
+  $("wallVal").textContent = wt.label.toUpperCase();
+  $("depthVal").textContent = ceilDepthLabel(state.depth);
+  const flangeItem = DB.flanges.find(f=>f.key===state.flange);
+  $("flangeVal").textContent = ceil
+    ? ceilDepthLabel(state.flange) + " FLANGE"
+    : (flangeItem ? flangeItem.label : state.flange) + (state.flange==="125" ? " (DRYWALL)" : " (STRUCTURAL)");
+  $("spacingVal").textContent = `${state.spacing}" OC`;
+  $("loadVal").textContent = `${state.psf} PSF${state.psfSource==="wind"?" (WIND)":""}`;
+  $("deflVal").textContent = `L/${state.defl}`;
+  $("finishRow").style.display = ext ? "" : "none";
+  $("finishVal").textContent = ext ? DB.finishes.find(f=>f.key===state.finish).label : "—";
+  $("windBox").style.display = ext ? "" : "none";
+  $("compRow").style.display = (ext || ceil || state.flange!=="125") ? "none" : "";
+  $("windRedRow").style.display = ext ? "" : "none";
+  // ceiling-only controls and relabelling
+  $("ceilAppRow").style.display = (ceil && state.ceilSystem==="joist") ? "" : "none";
+  $("ceilSysRow").style.display = ceil ? "" : "none";
+  $("ceilBraceRow").style.display = ceil ? "" : "none";
+  $("flangeRow").style.display = (ceil && state.ceilSystem!=="joist") ? "none" : "";
+  $("targetLabel").textContent = ceil ? "Target Clear Span" : "Target Wall Height";
+  $("depthLabel").textContent = ceil
+    ? (state.ceilSystem==="joist" ? "Joist Size (Web)" : "Channel Size") : "Stud Size (Web)";
+  $("spacingLabel").textContent = ceil
+    ? (state.ceilSystem==="joist" ? "Joist Spacing" : "Channel Spacing") : "Stud Spacing";
+  if (ceil){
+    const isJoist = state.ceilSystem==="joist";
+    $("ceilAppVal").textContent = DB.ceilApps.find(a=>a.key===state.ceilApp).label.toUpperCase();
+    $("ceilSysVal").textContent = ceilSystem(state.ceilSystem).label;
+    $("ceilBraceLabel").textContent = isJoist ? "Compression Flange" : "Span Condition";
+    const braceItems = isJoist ? DB.ceilBraces : DB.ceilRuns;
+    const braceKey = isJoist ? state.ceilBrace : state.ceilRun;
+    $("ceilBraceVal").textContent = braceItems.find(b=>b.key===braceKey).label;
+    syncSeg($("ceilAppSeg"), state.ceilApp);
+    syncSeg($("ceilSysSeg"), state.ceilSystem);
+    syncSeg($("ceilBraceSeg"), braceKey);
+  }
+  syncSeg($("wallSeg"), state.wallType);
+  syncSeg($("depthSeg"), state.depth);
+  syncSeg($("flangeSeg"), state.flange);
+  syncSeg($("spacingSeg"), state.spacing);
+  syncSeg($("loadSeg"), state.psfSource==="preset"?state.psf:"—");
+  syncSeg($("deflSeg"), state.defl);
+  syncSeg($("finishSeg"), state.finish);
+  syncSeg($("windExpSeg"), state.windExp);
+  $("compToggle").classList.toggle("on", state.composite);
+  $("windRedToggle").classList.toggle("on", state.windReduction);
+  if (document.activeElement !== $("windV")) $("windV").value = state.windV;  // don't fight the user mid-type
+  updateWindOut();
+
+  if (ceil){
+    const isJoist = state.ceilSystem==="joist";
+    const cond = isJoist
+      ? DB.ceilBraces.find(b=>b.key===state.ceilBrace).label
+      : DB.ceilRuns.find(b=>b.key===state.ceilRun).label;
+    $("critSummary").innerHTML =
+      `<b>DESIGN CRITERIA TRACE</b><br>` +
+      `type: <b>${wt.long}</b><br>` +
+      `system: <b>${ceilSystem(state.ceilSystem).long}</b><br>` +
+      `member: <b>${ceilDepthLabel(state.depth)}</b>${isJoist?` × <b>${ceilDepthLabel(state.flange)} flg</b>`:""} @ <b>${state.spacing}" OC</b><br>` +
+      `total load: <b>${state.psf} psf</b> — acts up or down on the ceiling<br>` +
+      `condition: <b>${cond}</b> · simple span<br>` +
+      `serviceability: <b>L/${state.defl}</b><br>` +
+      (state.psf > 10 ? `<b style="color:var(--amber)">⚠ over 10 psf — SSMA requires an approved CP60 coating</b><br>` : "") +
+      `target span: <span class="o">${fmtFtIn(state.targetIn)}</span> support to support<br>` +
+      `<span style="color:var(--paper-faint)">values read straight from the SSMA published span tables — nothing computed</span>`;
+    return;
+  }
+  const w = Engine.loadPerInch(state.psf, state.spacing).toFixed(4);
+  const fin = DB.finishes.find(f=>f.key===state.finish);
+  $("critSummary").innerHTML =
+    `<b>DESIGN CRITERIA TRACE</b><br>` +
+    `type: <b>${wt.long}</b><br>` +
+    `wall: <b>${ceilDepthLabel(state.depth)}</b> × <b>${(DB.flanges.find(f=>f.key===state.flange)||{label:state.flange}).label} flg</b> @ <b>${state.spacing}" OC</b><br>` +
+    (isCalcOnly(state.depth, state.flange) ? `<b style="color:var(--amber)">⚠ SSMA publishes no wall height table for this ${CALC_ONLY_FLANGES.has(state.flange)?"flange":"depth"} — heights are engine-computed from SSMA section properties</b><br>` : "") +
+    `lateral: <b>${state.psf} psf</b> → w = <span class="o">${w} lb/in</span>${ext&&state.windReduction?` (defl @ 0.7w)`:""}<br>` +
+    (ext?`finish: <b>${fin.label}</b> — ${fin.note}<br>`:"") +
+    `serviceability: <b>L/${state.defl}</b>${!ext?` · <b>${state.composite?"COMPOSITE":"NON-COMPOSITE"}</b>`:""}<br>` +
+    `target: <span class="o">${fmtFtIn(state.targetIn)}</span> underside of structure`;
+}
+
+/* ================================================================
+   6. MATRIX + QUICK COMPARE
+   ================================================================ */
+function renderMatrix(){
+  const results = evaluateMatrix();
+  const best = globalBestPick(results);
+  const allRows = results.flatMap(r=>r.rows);
+  const alive = state.selected && allRows.some(r=>r.fam.famId===state.selected.famId && r.member.desig===state.selected.desig);
+  if (!alive) state.selected = best ? { famId:best.fam.famId, desig:best.member.desig } : null;
+
+  $("targetBanner").innerHTML = `
+    <div>
+      <div class="tb-h">${fmtFtIn(state.targetIn)}</div>
+      <div class="tb-meta">${activeWallType().label.toUpperCase()}${state.wallType==="ceiling"?" · "+ceilSystem(state.ceilSystem).label:""} · ${ceilDepthLabel(state.depth)}${(state.wallType!=="ceiling"||state.ceilSystem==="joist")?" × "+ceilDepthLabel(state.flange):""} @ ${state.spacing}" OC · ${state.psf} PSF · L/${state.defl}${state.composite?" · COMPOSITE":""}</div>
+    </div>
+    <div class="tb-pick">
+      <div class="pk-lbl">${state.wallType==="ceiling"?"OPTIMAL BID PICK (LIGHTEST SPANNING)":"OPTIMAL BID PICK (LIGHTEST PASSING)"}</div>
+      ${best
+        ? `<div class="pk-val">${best.member.desig} <span style="font-size:12px;color:var(--paper-dim)">(${best.member.ga} · ${fmtFtIn(best.inches)})</span>${
+             best.member.calc?' <span class="chip est">CALC — NO SSMA HEIGHT TABLE FOR THIS SIZE</span>':''}${
+             (best.member.endStiff||best.endStiff)?' <span class="chip eq">END STIFFENERS REQ</span>':''}</div>`
+        : `<div class="pk-val none">NO MEMBER QUALIFIES — UPSIZE / TIGHTEN SPACING</div>`}
+    </div>`;
+
+  $("matrix").innerHTML = results.map(({fam, rows, pick})=>{
+    if (!rows.length) return `<div class="mfr-block"><div class="mfr-head"><h3>${fam.name}</h3><span class="fam">no members at this depth</span></div></div>`;
+    const body = rows.map(r=>{
+      const isPick = pick && r.member.desig===pick.member.desig;
+      const isSel = state.selected && state.selected.famId===fam.famId && state.selected.desig===r.member.desig;
+      const pct = Math.max(0, Math.min(1, r.inches/Math.max(state.targetIn,1)));
+      const surplus = r.inches - state.targetIn;
+      return `<tr class="row ${isSel?'selected':''}" data-fam="${fam.famId}" data-desig="${r.member.desig}">
+        <td><span class="desig">${r.member.desig}</span> ${r.member.eq?'<span class="chip eq">EQ</span>':''} ${r.member.compOnly?'<span class="chip eq">COMP ONLY</span>':''} ${
+            r.member.est ? '<span class="chip est">EST</span>'
+          : r.member.calc ? '<span class="chip est" title="SSMA publishes section properties for this depth and flange but no wall height table - this height is computed by the engine">CALC</span>'
+          : '<span class="chip ver">SSMA</span>'} ${
+            (r.member.endStiff || r.endStiff) ? '<span class="chip eq" title="Web stiffeners required at end reactions">END STIFF</span>' : ''}<br>
+            <span class="ga">${r.member.ga} · ${r.member.mil} mil · ${r.member.fy} ksi${r.member.alias?` · <span style="color:var(--orange);font-weight:700">CO. CODE: ${r.member.alias}</span>`:""}${(!r.member.eq && r.member.mil===18 && r.member.flange==="125")?` · <span style="color:var(--amber);font-weight:700">⚠ 33 KSI — NOT THE 20GA EQ${COMPANY_ALIAS_20EQ[r.member.depth]?" ("+COMPANY_ALIAS_20EQ[r.member.depth]+")":""}</span>`:""}</span></td>
+        <td><span class="ht" style="color:${r.nr?'var(--paper-faint)':(r.pass?'var(--green)':'var(--red)')}">${r.nr?'N/R':fmtFtIn(r.inches)}</span><br><span class="gov">${r.governs}${(r.member.table||r.member.ceil||r.nr)?'':' GOVERNS'}</span></td>
+        <td><div class="margin-bar"><i style="width:${pct*100}%;background:${r.pass?'var(--green)':'var(--red)'}"></i></div>
+            <span class="gov">${surplus>=0?'+':'−'}${Math.abs(surplus)}" ${surplus>=0?'margin':'short'}</span></td>
+        <td style="text-align:right">${isPick?'<span class="chip pick">BID PICK</span> ':''}<span class="chip ${r.pass?'pass':'fail'}">${r.pass?'PASS':'FAIL'}</span></td>
+      </tr>`;
+    }).join("");
+    return `<div class="mfr-block">
+      <div class="mfr-head"><h3>${fam.name}</h3><span class="fam">${fam.sub}</span>
+        <span class="esr">${fam.mixed?'<span class="chip ver">SSMA = VERIFIED</span> <span class="chip est">EQ = ESTIMATE</span>':(fam.verified&&fam.members.length&&fam.members.every(m=>m.calc)?'<span class="chip est">COMPUTED FROM SSMA PROPERTIES</span>':fam.verified?'<span class="chip ver">VERIFIED DATA</span>':'<span class="chip est">ESTIMATE — VERIFY</span>')} ${fam.esr}</span></div>
+      <table class="gauge-table">
+        <thead><tr><th>Member</th><th>Allowable Height</th><th>Margin vs Target</th><th style="text-align:right">Status</th></tr></thead>
+        <tbody>${body}</tbody>
+      </table>
+      ${fam.famId.startsWith("ssma")?`<div class="avail-strip"><b>MANUFACTURED BY:</b> ${MANUFACTURERS.map(m=>m.name).join(" · ")} — SSMA-standard profiles are interchangeable across these producers.</div>`:""}
+      ${fam.mixed?`<div class="avail-strip"><b>NOTE:</b> rows tagged <b>SSMA</b> are industry-standard sections (verified, identical from every manufacturer); rows tagged <b>EST</b> are this maker's proprietary EQ studs — confirm exact heights in the linked catalog.</div>`:""}
+    </div>`;
+  }).join("");
+
+  $("matrix").querySelectorAll("tr.row").forEach(tr=>{
+    tr.addEventListener("click", ()=>{
+      state.selected = { famId:tr.dataset.fam, desig:tr.dataset.desig };
+      renderMatrix(); renderDoc();
+    });
+  });
+
+  renderQuickCompare();
+}
+function renderQuickCompare(){
+  const spacings = activeSpacings();
+  const head = spacings.map(s=>`<th>${s}" OC</th>`).join("");
+  const rows = activeDepths().map(d=>{
+    const cells = spacings.map(s=>{
+      const c = {...state, depth:d.key, spacing:s};
+      // each depth publishes its own flange ladder, so keep the cell legal
+      if (c.wallType==="ceiling"){
+        const fl = ceilFlanges(c, d.key);
+        if (fl.length && !fl.includes(c.flange)) c.flange = fl.includes("162")?"162":fl[0];
+      } else if (c.flange!=="125" && !(SSMA_STRUCTURAL[d.key]||{})[c.flange]){
+        return `<td><span class="miss">—</span></td>`;
+      }
+      const best = globalBestPick(evaluateMatrix(c));
+      const cur = d.key===state.depth && s===state.spacing;
+      if (!best) return `<td class="${cur?'cur':''}"><span class="miss">—</span></td>`;
+      return `<td class="${cur?'cur':''}"><span class="hit">${best.member.desig}<small>${best.member.ga} · ${fmtFtIn(best.inches)}</small></span></td>`;
+    }).join("");
+    return `<tr><td class="dep">${d.label}</td>${cells}</tr>`;
+  }).join("");
+  $("qcBody").innerHTML = `<table class="qc-table">
+    <thead><tr><th>LIGHTEST PASSING @ ${fmtFtIn(state.targetIn)}</th>${head}</tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+
+/* ================================================================
+   7. SOURCE DOCUMENT VIEWER
+   ================================================================ */
+function renderDoc(){
+  const viewer = $("docViewer");
+  if (!state.selected){
+    viewer.innerHTML = `<div class="doc-empty">NO QUALIFYING MEMBER UNDER CURRENT CRITERIA<br>— ADJUST SPEC TO GENERATE A SUBMITTAL REFERENCE —</div>`;
+    return;
+  }
+  const results = evaluateMatrix();
+  const block = results.find(r=>r.fam.famId===state.selected.famId);
+  if (!block){ state.selected=null; return renderDoc(); }
+  const fam = block.fam;
+  const row = block.rows.find(r=>r.member.desig===state.selected.desig);
+  if (!row){ state.selected=null; return renderDoc(); }
+  const m = row.member;
+  const links = fam.links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener">📄 ${l.label}</a>`).join("");
+  if (m.ceil) return renderCeilingDoc(viewer, fam, block, m, links);
+  const isStructural = m.flange && m.flange!=="125";
+  // SSMA "Curtain Wall Limiting Heights — Single Span" column layout (Tech Guide pp.25–30)
+  const CW_COLS = [
+    {psf:5, defls:[120,240,360]}, {psf:15, defls:[240,360,600]}, {psf:20, defls:[240,360,600]},
+    {psf:25, defls:[240,360,600]}, {psf:30, defls:[240,360,600]}, {psf:40, defls:[240,360,600]}, {psf:50, defls:[240,360,600]},
+  ];
+  let facInner;
+  if (isStructural){
+    const head1 = CW_COLS.map(c=>`<th colspan="3" style="border-bottom:1px solid #4a5a72">${c.psf} PSF</th>`).join("");
+    const head2 = CW_COLS.flatMap(c=>c.defls.map(d=>`<th>L/${d}</th>`)).join("");
+    const body = [12,16,24].map(sp=>{
+      const cells = CW_COLS.flatMap(c=>c.defls.map(d=>{
+        const h = Engine.limitingHeight(m, {wallType:"exterior", psf:c.psf, spacing:sp, defl:d, windReduction:true});
+        const hl = sp===state.spacing && c.psf===state.psf && d===state.defl;
+        return `<td class="${hl?'hl':''}">${h.nr?'n/r':fmtFtIn(h.inches)}</td>`;
+      })).join("");
+      return `<tr><td class="mem">${sp}" oc</td>${cells}</tr>`;
+    }).join("");
+    facInner = `
+      <div class="fac-title">${m.calc?"Computed Limiting Heights":"SSMA Curtain Wall Limiting Heights"} — ${m.desig}</div>
+      <div class="fac-sub">SINGLE SPAN · Fy ${m.fy} ksi · wind deflection @ 0.70W · 5 psf unreduced${m.calc?" — computed from SSMA section properties, NOT a published table":' — matches the SSMA "Curtain Wall Limiting Heights" table'}</div>
+      <div style="overflow-x:auto"><table class="fac-table" style="min-width:640px">
+        <thead><tr><th rowspan="2" style="text-align:left">SPACING</th>${head1}</tr><tr>${head2}</tr></thead>
+        <tbody>${body}</tbody>
+      </table></div>
+      <div class="fac-note">Highlighted cell = your current criteria (${state.spacing}" oc · ${state.psf} psf · L/${state.defl}). ${m.calc?`SSMA publishes no curtain wall table for ${m.desig}; there is no book row to match. Confirm with the EOR before this goes to a GC.`:`Lay this beside the SSMA "Curtain Wall Limiting Heights — Single Span" row for ${m.desig} — every cell should match.`} "n/r" = not tabulated.</div>`;
+  } else {
+    const facBody = block.rows.map(r2=>{
+      const cells = DB.deflections.map(n=>{
+        const h = Engine.limitingHeight(r2.member, {...state, defl:n});
+        const hl = r2.member.desig===m.desig && n===state.defl;
+        return `<td class="${hl?'hl':''}">${h.nr?'n/r':fmtFtIn(h.inches)}</td>`;
+      }).join("");
+      return `<tr><td class="mem">${r2.member.desig}</td>${cells}</tr>`;
+    }).join("");
+    facInner = `
+      <div class="fac-title">Limiting Heights — ${DB.depths.find(d=>d.key===state.depth).label} Drywall Studs</div>
+      <div class="fac-sub">UNIFORM LATERAL ${state.psf} PSF · ${state.spacing}" O.C. · SIMPLE SPAN · ${state.composite?"COMPOSITE":"NON-COMPOSITE"}</div>
+      <table class="fac-table">
+        <thead><tr><th style="text-align:left">MEMBER</th>${DB.deflections.map(n=>`<th>L/${n}</th>`).join("")}</tr></thead>
+        <tbody>${facBody}</tbody>
+      </table>
+      <div class="fac-note">Regenerated from ${m.est?"estimated":"SSMA-published"} section properties per AISI S100. Highlighted cell = criteria applied. Open the linked source above to verify line-by-line.</div>`;
+  }
+
+  viewer.innerHTML = `
+  <div class="doc-card">
+    <div class="doc-head">
+      <div class="src-tag">SOURCE DOCUMENT · DO NOT BID BLIND</div>
+      <h4>${fam.name}</h4>
+      <div class="sub">${fam.sub}<br>${fam.esr} ${m.est?'· <span class="chip est">ESTIMATE — VERIFY BEFORE BID</span>':m.calc?'· <span class="chip est">SSMA SECTION PROPS · HEIGHT COMPUTED</span>':'· <span class="chip ver">SSMA VERIFIED DATA</span>'}</div>
+    </div>
+    <div class="doc-links">${links}</div>
+    <div class="doc-meta">
+      <dl>
+        <dt>MEMBER</dt><dd class="o">${m.desig} (${m.ga} · ${m.mil} mil · ${m.fy} ksi)</dd>
+        ${m.alias?`<dt>CO. CODE</dt><dd class="o">${m.alias} — dept naming for 20ga EQ</dd>`:""}
+        <dt>LOAD CASE</dt><dd>${state.psf} psf · ${state.spacing}" OC · L/${state.defl}${state.wallType==="exterior"&&state.windReduction?" · 0.7W defl":""}${state.composite?" · composite":""}</dd>
+        <dt>ALLOWABLE</dt><dd class="o">${fmtFtIn(row.inches)} — ${row.governs} governs (Δ ${fmtFtIn(row.deflH)} / M ${fmtFtIn(row.strH)})</dd>
+        <dt>SECTION</dt><dd>Ix = ${m.ix.toFixed(3)} in⁴ (gross, deflection) · Ma = ${m.ma.toLocaleString()} lb·in</dd>
+        <dt>PROVENANCE</dt><dd>${m.est?"Calibrated estimate — confirm in linked catalog":"SSMA Product Technical Guide (local copy in sources/)"}</dd>
+      </dl>
+    </div>
+    <div class="facsimile">
+      <div class="fac-frame">${facInner}</div>
+    </div>
+    <div class="audit-trail">
+      <div class="at-step"><span class="n">①</span><span>PARSE SPEC — wall at <b>${fmtFtIn(state.targetIn)}</b>, ${DB.depths.find(d=>d.key===state.depth).label} @ ${state.spacing}" OC, ${state.psf} psf / L/${state.defl}.</span></div>
+      <div class="at-step"><span class="n">②</span><span>CROSS-REFERENCE — <b>${fam.esr}</b>, column L/${state.defl} @ ${state.spacing}" OC. ${m.est?"<b>EQ proprietary line — open catalog link and confirm the cell.</b>":"Properties verified against SSMA guide."}</span></div>
+      <div class="at-step"><span class="n">③</span><span>OPTIMIZE — <b>${m.desig}</b> allows <b>${fmtFtIn(row.inches)}</b> ${row.inches>=state.targetIn?`≥ target → <b>+${row.inches-state.targetIn}"</b> reserve. Lightest qualifying section carried to bid.`:`— <b style="color:var(--red)">FAILS by ${state.targetIn-row.inches}"</b>. Reference only.`}</span></div>
+    </div>
+  </div>`;
+}
+
+// Ceiling / soffit members are a pure table lookup, so the facsimile shows the
+// published grid straight from the guide: every load column at every spacing.
+function renderCeilingDoc(viewer, fam, block, m, links){
+  const row = block.rows.find(r=>r.member.desig===m.desig);
+  const isJoist = m.ceilKind === "S";
+  const loads = ceilLoads(state);
+  const spacings = ceilSystem(state.ceilSystem).spacings;
+  const variants = isJoist ? DB.ceilBraces : DB.ceilRuns;
+  const activeVariant = isJoist ? state.ceilBrace : state.ceilRun;
+  const PAGE = { joist: state.ceilApp==="interior" ? "pp.62-63" : "pp.64-67",
+                 furring:"p.68", channel:"p.69" }[state.ceilSystem];
+
+  const head = loads.map(l=>`<th colspan="${spacings.length}" style="border-bottom:1px solid #4a5a72">${l} PSF</th>`).join("");
+  const head2 = loads.flatMap(()=>spacings.map(s=>`<th>${s}"</th>`)).join("");
+  const body = variants.map(v=>{
+    const cells = loads.flatMap(l=>spacings.map(s=>{
+      const c = {...state, psf:l, spacing:s,
+                 ceilBrace:isJoist?v.key:state.ceilBrace,
+                 ceilRun:isJoist?state.ceilRun:v.key};
+      const h = Engine.ceilingSpan(m, c);
+      const hl = l===state.psf && s===state.spacing && v.key===activeVariant;
+      return `<td class="${hl?'hl':''}">${h.nr?'n/r':fmtFtIn(h.inches)}${h.endStiff?'<sup>e</sup>':''}</td>`;
+    })).join("");
+    return `<tr><td class="mem">${v.label}</td>${cells}</tr>`;
+  }).join("");
+
+  const facInner = `
+    <div class="fac-title">SSMA Allowable Ceiling / Soffit Spans — ${m.desig}</div>
+    <div class="fac-sub">${DB.ceilApps.find(a=>a.key===state.ceilApp).label.toUpperCase()} · L/${state.defl} · Fy ${m.fy} ksi · simple span — guide ${PAGE}</div>
+    <div style="overflow-x:auto"><table class="fac-table" style="min-width:560px">
+      <thead><tr><th rowspan="2" style="text-align:left">CONDITION</th>${head}</tr><tr>${head2}</tr></thead>
+      <tbody>${body}</tbody>
+    </table></div>
+    <div class="fac-note">Highlighted cell = your current criteria (${state.psf} psf · ${state.spacing}" oc · L/${state.defl}). Lay this beside the SSMA "${isJoist?"Allowable Ceiling/Soffit Spans (S-Sections)":"Allowable Ceiling Spans"}" row for ${m.desig} — every cell is a direct transcription, nothing is computed. <b>e</b> = web stiffeners required at end reactions. "n/r" = not tabulated.</div>`;
+
+  viewer.innerHTML = `
+  <div class="doc-card">
+    <div class="doc-head">
+      <div class="src-tag">SOURCE DOCUMENT · DO NOT BID BLIND</div>
+      <h4>${fam.name}</h4>
+      <div class="sub">${fam.sub}<br>${fam.esr} · <span class="chip ver">SSMA PUBLISHED TABLE</span></div>
+    </div>
+    <div class="doc-links">${links}</div>
+    <div class="doc-meta">
+      <dl>
+        <dt>MEMBER</dt><dd class="o">${m.desig} (${m.ga} · ${m.mil} mil · ${m.fy} ksi)</dd>
+        <dt>LOAD CASE</dt><dd>${state.psf} psf total · ${state.spacing}" OC · L/${state.defl} · ${variants.find(v=>v.key===activeVariant).label}</dd>
+        <dt>ALLOWABLE</dt><dd class="o">${row.nr?"NOT TABULATED":fmtFtIn(row.inches)}${row.endStiff?" — end web stiffeners required":""}</dd>
+        <dt>BASIS</dt><dd>Direct lookup of the SSMA published span table (${PAGE}). No interpolation.</dd>
+        <dt>PROVENANCE</dt><dd>SSMA Product Technical Guide (local copy in sources/)</dd>
+      </dl>
+    </div>
+    <div class="facsimile">
+      <div class="fac-frame">${facInner}</div>
+    </div>
+    <div class="audit-trail">
+      <div class="at-step"><span class="n">①</span><span>PARSE SPEC — ceiling spanning <b>${fmtFtIn(state.targetIn)}</b>, ${ceilSystem(state.ceilSystem).long} @ ${state.spacing}" OC, ${state.psf} psf / L/${state.defl}.</span></div>
+      <div class="at-step"><span class="n">②</span><span>CROSS-REFERENCE — <b>${fam.esr}</b> ${PAGE}, ${variants.find(v=>v.key===activeVariant).label} row. Values are published, not derived.</span></div>
+      <div class="at-step"><span class="n">③</span><span>OPTIMIZE — <b>${m.desig}</b> spans <b>${row.nr?"n/r":fmtFtIn(row.inches)}</b> ${!row.nr&&row.inches>=state.targetIn?`≥ target → <b>+${row.inches-state.targetIn}"</b> reserve. Lightest qualifying section carried to bid.`:`— <b style="color:var(--red)">does not reach target</b>. Reference only.`}</span></div>
+      ${state.psf>10?`<div class="at-step"><span class="n">④</span><span><b style="color:var(--amber)">COATING — loads over 10 psf require an approved CP60 coating per the SSMA table footnote.</b></span></div>`:""}
+    </div>
+  </div>`;
+}
+
+/* ================================================================
+   8. AI ESTIMATOR ASSISTANT
+   ================================================================ */
+const SpecParser = {
+  parse(text){
+    const t = text.toLowerCase().replace(/[“”]/g,'"').replace(/[’']/g,"'");
+    const out = { found:{}, notes:[] };
+    // wall type
+    if (/exterior|curtain\s*wall|wind\b|veneer|cladding/.test(t)) out.found.wallType="exterior";
+    else if (/interior|partition/.test(t)) out.found.wallType="interior";
+    // company codes for 20ga EQ studs (dept convention): 35820S / 620S / 420S / 250S
+    const coM = t.match(/\b(35820|620|420|250)s\b(?!\d)/);
+    if (coM){
+      out.found.depth = ({ "35820":"362", "620":"600", "420":"400", "250":"250" })[coM[1]];
+      out.found.mil = 18; out.found.ga = 20; out.found.eqCo = true; out.found.flange = "125";
+      out.notes.push(`Company code ${coM[1].toUpperCase()}S read as ${out.found.depth==="362"?'3-5/8"':out.found.depth==="600"?'6"':out.found.depth==="400"?'4"':'2-1/2"'} 20ga EQ (18 mil).`);
+    }
+    // depth — fractional first; whole-inch sizes use lookbehind so 15'-6" can't match
+    const depthPatterns = [
+      [/3[\s-]?5\/8/, "362"], [/\b362(?:s|pds|vs)/, "362"],
+      [/2[\s-]?1\/2(?!\s*(?:"|in)?\s*(?:flange|flg))/, "250"], [/\b250(?:s|pds|vs)/, "250"],
+      [/(?<![\d'./-])8\s*(?:"|\s?in(?:ch)?)/, "800"], [/\b800s/, "800"],
+      [/(?<![\d'./-])6\s*(?:"|\s?in(?:ch)?)/, "600"], [/\b600(?:s|pds|vs)/, "600"],
+      [/(?<![\d'./-])4\s*(?:"|\s?in(?:ch)?)/, "400"], [/\b400(?:s|pds|vs)/, "400"],
+    ];
+    if (!out.found.depth) for (const [re,key] of depthPatterns){ if (re.test(t)){ out.found.depth=key; break; } }
+    // flange
+    if (/1[\s-]?5\/8\s*("|in)?\s*(flange|flg)|s162/.test(t)) out.found.flange="162";
+    else if (/1[\s-]?3\/8\s*("|in)?\s*(flange|flg)|s137/.test(t)) out.found.flange="137";
+    else if (/1[\s-]?1\/4\s*("|in)?\s*(flange|flg)|s125|pds|\bvs125|\bts125/.test(t)) out.found.flange="125";
+    else if (/2[\s-]?1\/2\s*("|in)?\s*(flange|flg)|s250/.test(t)) out.found.flange="250";
+    else if (/(?<![\d\/.-])3\s*("|in)?\s*(flange|flg)|s300/.test(t)) out.found.flange="300";
+    else if (/(?<![\d\/.-])2\s*("|in)?\s*(flange|flg)|s200/.test(t)) out.found.flange="200";
+    // gauge / mil
+    const milM = t.match(/(\d{2})\s*mil/);
+    const gaM  = t.match(/(\d{2})\s*ga(?:uge)?/);
+    if (milM) out.found.mil = +milM[1];
+    else if (gaM){
+      out.found.ga = +gaM[1];
+      out.found.mil = ({25:18,22:27,20:33,18:43,16:54,14:68,12:97})[+gaM[1]] ?? null;
+    }
+    // spacing
+    const spM = t.match(/(12|16|24)\s*(?:"|in(?:ch)?(?:es)?)?\s*(?:o\.?\s*c|on\s*cent)/);
+    if (spM) out.found.spacing = +spM[1];
+    // deflection
+    const dM = t.match(/l\s*\/\s*(120|240|360|600|720)/);
+    if (dM) out.found.defl = +dM[1];
+    // load psf / wind mph
+    const lM = t.match(/(\d+(?:\.\d+)?)\s*psf/);
+    if (lM) out.found.psfRaw = parseFloat(lM[1]);
+    const vM = t.match(/(\d{2,3})\s*mph/);
+    if (vM) out.found.windV = +vM[1];
+    const eM = t.match(/exposure\s*([bcd])/);
+    if (eM) out.found.windExp = eM[1].toUpperCase();
+    // finish
+    if (/brick/.test(t)) out.found.finish="brick";
+    else if (/stone/.test(t)) out.found.finish="stone";
+    else if (/stucco|eifs/.test(t)) out.found.finish="stucco";
+    else if (/acm|metal\s*panel/.test(t)) out.found.finish="metal";
+    // height
+    const hM = t.match(/(\d{1,2})\s*(?:'|ft|feet)\s*[-–]?\s*(\d{1,2})?\s*(?:"|in)?/);
+    if (hM && +hM[1]>=8 && +hM[1]<=40) out.found.targetIn = (+hM[1])*12 + (+(hM[2]||0));
+    // composite
+    if (/non[- ]?composite/.test(t)) out.found.composite=false;
+    else if (/composite/.test(t)) out.found.composite=true;
+    return out;
+  }
+};
+const finding = (cls,ic,html)=> `<div class="ai-finding ${cls}"><span class="ic">${ic}</span><span>${html}</span></div>`;
+function aiAnalyze(){
+  const text = $("aiInput").value.trim();
+  const report = $("aiReport");
+  report.classList.add("show");
+  if (!text){ report.innerHTML = finding("warn","△","Paste a structural note or spec excerpt first."); return; }
+  const { found, notes } = SpecParser.parse(text);
+  const findings = [], applied = [];
+  notes.forEach(n=> findings.push(finding("info","⤷", n)));
+
+  if (found.wallType){ state.wallType=found.wallType; if(found.wallType==="exterior")state.composite=false; applied.push(found.wallType.toUpperCase()); }
+  if (found.depth){ state.depth=found.depth; applied.push(`stud ${DB.depths.find(d=>d.key===found.depth).label}`); }
+  if (found.flange){
+    if (found.flange==="125" && state.wallType==="exterior") state.flange="162";
+    else { state.flange=found.flange; applied.push(`${DB.flanges.find(f=>f.key===found.flange).label} flange`); }
+  }
+  if (found.spacing){ state.spacing=found.spacing; applied.push(`${found.spacing}" OC`); }
+  if (found.finish){ state.finish=found.finish; state.defl=DB.finishes.find(f=>f.key===found.finish).defl; applied.push(`${found.finish} finish → L/${state.defl}`); }
+  if (found.defl){ state.defl=found.defl; applied.push(`L/${found.defl}`); }
+  if (found.windV){
+    state.windV=found.windV; if (found.windExp) state.windExp=found.windExp;
+    state.wallType="exterior"; state.psf=Engine.windPsf(state.windV,state.windExp); state.psfSource="wind";
+    applied.push(`${found.windV} mph Exp ${state.windExp} → ${state.psf} psf ASD`);
+  } else if (found.psfRaw !== undefined){
+    state.psf=found.psfRaw; state.psfSource = activeLoads().includes(found.psfRaw)?"preset":"wind";
+    applied.push(`${found.psfRaw} psf`);
+  }
+  if (found.targetIn){ state.targetIn=found.targetIn; applied.push(`height ${fmtFtIn(found.targetIn)}`); }
+  if (found.composite!==undefined && state.wallType==="interior"){ state.composite=found.composite; applied.push(found.composite?"composite":"non-composite"); }
+  state.selected=null; rebuildLoadSeg();
+
+  if (applied.length) findings.push(finding("info","⤷",`Parsed & applied: <b>${applied.join(" · ")}</b>.`));
+  else findings.push(finding("warn","△","No framing criteria recognized — include stud size, gauge, spacing, deflection, load or height."));
+
+  if (found.targetIn || found.mil){
+    const results = evaluateMatrix();
+    const best = globalBestPick(results);
+    const allRows = results.flatMap(r=>r.rows);
+    if (found.mil){
+      const specRows = found.eqCo
+        ? allRows.filter(r=> r.member.eq && r.member.mil===18)   // company code = the 20ga EQ member specifically
+        : allRows.filter(r=> r.member.mil===found.mil || (found.ga===20 && [30,33].includes(r.member.mil)) || (found.ga===25 && [15,18].includes(r.member.mil)));
+      const specBest = specRows.sort((a,b)=>b.inches-a.inches)[0];
+      if (!specRows.length){
+        findings.push(finding("warn","△",`No ${found.ga?found.ga+"ga":found.mil+" mil"} member exists at this depth/flange in the dataset — check the spec against the SSMA guide.`));
+      } else if (!specBest.pass){
+        findings.push(finding("bad","✕",`<b>SPEC FAILS:</b> the specified ${found.ga?found.ga+"ga":found.mil+" mil"} tops out at <b>${fmtFtIn(specBest.inches)}</b> (${specBest.member.desig}, ${specBest.governs.toLowerCase()} governs) — short of <b>${fmtFtIn(state.targetIn)}</b>. Issue an RFI before bidding.`));
+        if (best) findings.push(finding("info","⤷",`Nearest compliant: <b>${best.member.desig}</b> (${best.member.ga}) at ${fmtFtIn(best.inches)}.`));
+      } else if (best && best.member.mil < found.mil){
+        findings.push(finding("warn","△",`<b>OVER-ENGINEERED:</b> spec calls for ${found.ga?found.ga+"ga":found.mil+" mil"}, but <b>${best.member.desig}</b> (${best.member.ga}) already clears ${fmtFtIn(state.targetIn)} at <b>${fmtFtIn(best.inches)}</b>${best.member.est?" <i>(EQ estimate — verify in catalog)</i>":""}. Candidate for value-engineering substitution.`));
+      } else {
+        findings.push(finding("ok","✓",`<b>SPEC CHECKS OUT:</b> ${specBest.member.desig} allows <b>${fmtFtIn(specBest.inches)}</b> ≥ ${fmtFtIn(state.targetIn)} (+${specBest.inches-state.targetIn}") and is already the lightest qualifying gauge. Bid as drawn.`));
+      }
+    } else if (best){
+      findings.push(finding("ok","✓",`Lightest qualifying member: <b>${best.member.desig}</b> (${best.member.ga}) — allows ${fmtFtIn(best.inches)}.${best.member.est?" <i>(EQ estimate — verify in catalog)</i>":""}`));
+    } else {
+      findings.push(finding("bad","✕",`<b>NO MEMBER QUALIFIES</b> at ${DB.depths.find(d=>d.key===state.depth).label} for ${fmtFtIn(state.targetIn)} under these criteria. Upsize depth/flange, tighten spacing, or revisit the deflection limit.`));
+    }
+  }
+  report.innerHTML = findings.join("");
+  renderAll();
+}
+const SAMPLES = [
+  `STRUCTURAL NOTE 7.3 — INTERIOR PARTITIONS: Walls to underside of deck at 15'-6". Frame with 3-5/8" 20ga metal studs at 16" OC, non-composite. Design for 5 psf lateral load, deflection limited to L/240 per IBC Table 1604.3.`,
+  `EXTERIOR WALL NOTE: Parapet-height curtain wall framing to 24'-0". 6" 16ga studs with 1-5/8" flange at 16" OC. Brick veneer — deflection limited to L/600. Basic wind speed 115 mph, Exposure C.`,
+];
+let sampleIdx = 0;
+
+/* ================================================================
+   9. FIELD GUIDE + SOURCES
+   ================================================================ */
+const GUIDE = {
+  ssma: `<div class="guide-sec"><h3>What is SSMA?</h3>
+    <p>The <b>Steel Stud Manufacturers Association</b> — the industry body that standardized stud profiles, dimensions and section properties. A designation like <b>362S125-30</b> (3-5/8" web · S-stud · 1-1/4" flange · 30 mil) describes the <i>same physical product</i> no matter who rolls it: ClarkDietrich, CEMCO, Marino\\WARE, Telling or Steeler all make interchangeable SSMA-standard studs.</p>
+    <p>That's why rows tagged <b>SSMA</b> appear identically under every manufacturer block: the published properties (and therefore the limiting heights) are one and the same. The rows that genuinely differ between manufacturers are their proprietary <b>EQ lines</b> (ProSTUD, ViperStud, TRUE-STUD) — those use patented profiles and higher-strength steel covered by each maker's own ICC-ES report, which is why they're tagged <b>EST</b> until you verify the exact catalog value.</p></div>`,
+  walltype: `<div class="guide-sec"><h3>Wall Type — Interior vs Exterior</h3>
+    <p><b>Interior non-structural partitions</b> use lightweight drywall studs (S125, 1-1/4" flange) or proprietary high-strength <b>EQ studs</b>. The governing load is a code-minimum <b>5 psf</b> interior air-pressure load (IBC §1607). They carry no axial building load.</p>
+    <p><b>Exterior walls</b> (curtain wall infill / wind-bearing) use SSMA <b>structural studs</b> (S137/S162/S200 flanges, 33–97 mil) designed for real <b>wind pressure</b> — typically 10–30+ psf depending on wind speed, exposure and building height. Always confirm pressures with the EOR.</p></div>`,
+  ceiling: `<div class="guide-sec"><h3>Ceiling / Soffit Spans</h3>
+    <p>Switch <b>Wall Type</b> to <b>CEILING</b> and the tool stops sizing a wall and starts sizing a horizontal span: how far a member can run between supports. The target becomes a <b>clear span</b>, support to support.</p>
+    <p>Three framing systems, because they are three different products:</p>
+    <table><tr><th>SYSTEM</th><th>WHAT IT IS</th></tr>
+    <tr><td><b>S-JOIST</b></td><td>An ordinary C-stud turned on its side and used as a ceiling or soffit joist. The heavy lifter for framed ceilings, drops and exterior soffits.</td></tr>
+    <tr><td><b>HAT FURR</b></td><td>Hat (furring) channel — the 7/8" or 1-1/2" F-section screwed across framing to receive board.</td></tr>
+    <tr><td><b>CRC / U</b></td><td>Cold-rolled U-channel, the 3/4"–2-1/2" main runners in a suspended grid. Note it is spaced 24"–72" OC, not 12"–24".</td></tr></table>
+    <p><b>The load is total load, not wind.</b> 4 and 6 psf cover ordinary board ceilings; 13 psf is the heavy case. Anything over 10 psf requires an approved CP60 coating per SSMA's own footnote, and the app will say so.</p>
+    <p><b>Bracing changes the answer a lot.</b> For S-joists, bracing the compression flange at midspan can add several feet of span — on a 6" 20ga joist at 6 psf / 16" OC it is the difference between 15'-2" and 22'-0". If you bid the braced number, the bracing has to actually be in the takeoff. For hat furring and CRC the equivalent choice is single span versus continuous over two or more spans.</p>
+    <p>Every number in ceiling mode is read straight out of the SSMA published span tables — nothing is computed and nothing is interpolated. A combination SSMA does not publish reads <b>N/R</b>. Rows marked <b>END STIFF</b> need web stiffeners at the end reactions; that is labour you should be carrying.</p></div>`,
+  deepstud: `<div class="guide-sec"><h3>10" and 12" studs — why they say CALC</h3>
+    <p>SSMA publishes section properties for 1000S and 1200S members, so this tool can size them. What SSMA does <b>not</b> publish is a limiting-height table for them: the Curtain Wall tables stop at 8" (800S200-118), and so do the ceiling tables.</p>
+    <p>So heights at 10" and 12" are calculated by this app's engine rather than read out of the book, and they carry a <b>CALC</b> chip instead of the green <b>SSMA</b> chip. The engine reproduces the published book exactly at every depth SSMA does tabulate, and the math does not change with depth, so the numbers are sound — but there is no published cell to point at. Treat a CALC number as a solid bid basis that still wants the EOR's signature before it goes to a GC as a commitment.</p>
+    <p>Two practical notes. These depths have no 1-3/8" flange and no S125 drywall ladder, so those options simply disappear. And the lightest gauge at each depth (1000S-43, 1200S-54) exceeds a web height-to-thickness ratio of 200, which means <b>web stiffeners are required at every support</b> — the row is chipped END STIFF, and that is a real line item.</p></div>`,
+  psf: `<div class="guide-sec"><h3>Lateral Load (psf) — what it means & when to use it</h3>
+    <p>The uniform horizontal pressure the wall must resist, in pounds per square foot.</p>
+    <table><tr><th>LOAD</th><th>WHEN TO USE</th></tr>
+    <tr><td>5 psf</td><td>Code minimum for interior partitions (IBC §1607). The default for office/tenant work.</td></tr>
+    <tr><td>7.5–10 psf</td><td>Corridors of care facilities, gyms, high-abuse walls, or where the spec says so.</td></tr>
+    <tr><td>10–30 psf</td><td>Exterior wind (components & cladding). Use the wind calculator or the EOR's pressure schedule.</td></tr></table>
+    <p><b>ASD note:</b> exterior tables (and this app) work at service-level pressure (0.6W). Per IBC Table 1604.3 footnote f, the <i>deflection</i> check may use 0.7 × the wind load — that's the "0.70 × WIND" toggle.</p></div>`,
+  defl: `<div class="guide-sec"><h3>Deflection Limit (L/n) — what it means & when to use it</h3>
+    <p>How far the wall may bow under load: span L divided by n. Bigger n = stiffer wall = shorter allowable height.</p>
+    <table><tr><th>LIMIT</th><th>WHEN TO USE</th></tr>
+    <tr><td>L/120</td><td>Bare walls / flexible finishes. A 12' wall may bow 1.2".</td></tr>
+    <tr><td>L/240</td><td>The workhorse for gypsum board both sides. Default for most partitions.</td></tr>
+    <tr><td>L/360</td><td>Stucco, EIFS, ceramic tile, veneer plaster — brittle finishes that crack.</td></tr>
+    <tr><td>L/600</td><td>Brick veneer backup (BIA Tech Note 28B).</td></tr>
+    <tr><td>L/720</td><td>Stone and other very brittle claddings, when specified.</td></tr></table></div>`,
+  flange: `<div class="guide-sec"><h3>Flange Size — 1-1/4" / 1-3/8" / 1-5/8" / 2"</h3>
+    <p>The flange is the face of the C-stud you screw into. Wider flange = more steel = higher Ixe and Ma = taller allowable height (and easier sheathing attachment).</p>
+    <ul><li><b>S125 (1-1/4")</b> — standard drywall studs, interior only.</li>
+    <li><b>S137 (1-3/8")</b> — economy structural.</li>
+    <li><b>S162 (1-5/8")</b> — the default structural stud. Most exterior tables assume this.</li>
+    <li><b>S200 (2")</b> — heavy-duty: jambs, headers, taller walls, stiffer backup.</li>
+    <li><b>S250 (2-1/2")</b> and <b>S300 (3")</b> — the widest SSMA flanges. A wider flange adds stiffness and moment capacity without going to a heavier gauge, so it can let a lighter, cheaper gauge pass where 14ga or 12ga would otherwise be needed. SSMA publishes section properties for these but <b>no wall limiting height table</b>, so the heights are computed by this app (CALC chip) and need the EOR's confirmation. Confirm availability and lead time with your supplier, since these are not stock profiles everywhere.</li></ul>
+    <p>The designation encodes it: <b>600S162-54</b> = 6" web · S-stud · 1.62" flange · 54 mil.</p></div>`,
+  finish: `<div class="guide-sec"><h3>Exterior Finish → Deflection</h3>
+    <p>The cladding doesn't change the wind load — it changes how much the wall is <i>allowed to move</i>. Brittle finishes crack; the industry response is a tighter deflection limit, which directly reduces limiting height:</p>
+    <table><tr><th>FINISH</th><th>TYPICAL LIMIT</th></tr>
+    <tr><td>Gyp sheathing / lightweight panel</td><td>L/240</td></tr><tr><td>ACM / metal panel</td><td>L/240 (check panel mfr)</td></tr>
+    <tr><td>Stucco / EIFS</td><td>L/360</td></tr><tr><td>Brick veneer</td><td>L/600</td></tr><tr><td>Stone</td><td>L/720</td></tr></table>
+    <p>Picking a finish in the app auto-sets the recommended limit — you can still override it.</p></div>`,
+  general: `<div class="guide-sec"><h3>Gauge ↔ Mil cheat sheet</h3>
+    <table><tr><th>GAUGE</th><th>MIL (DESIGN t)</th><th>NOTES</th></tr>
+    <tr><td>25 ga</td><td>18 mil (0.0188")</td><td>EQ versions are 15 mil @ 57 ksi</td></tr>
+    <tr><td>22 ga</td><td>27 mil</td><td>—</td></tr>
+    <tr><td>20 ga DW</td><td>30 mil</td><td>drywall 20ga; EQ versions are 18 mil @ 70 ksi</td></tr>
+    <tr><td>20 ga ST</td><td>33 mil</td><td>structural 20ga — NOT the same as 30 mil</td></tr>
+    <tr><td>18 ga</td><td>43 mil</td><td>33 ksi std</td></tr><tr><td>16 ga</td><td>54 mil</td><td>50 ksi std</td></tr>
+    <tr><td>14 ga</td><td>68 mil</td><td>50 ksi</td></tr><tr><td>12 ga</td><td>97 mil</td><td>50 ksi</td></tr></table></div>
+    <div class="guide-sec"><h3>EQ studs</h3>
+    <p><b>EQ ("equivalent") studs</b> — ProSTUD, ViperStud, etc. — use thinner, higher-strength steel (57–70 ksi) plus stiffening ribs to match or beat conventional-gauge performance at lower weight and cost. They're proprietary: limiting heights come from each maker's ICC-ES report, not SSMA. That's why EQ rows are flagged <b>ESTIMATE — VERIFY</b> here: always pull the exact number from the linked catalog before bid day.</p>
+    <p><b>⚠ The 18-mil trap:</b> two different products are 18 mil thick. <b>S125-18</b> (e.g. 362S125-18) is the conventional <b>25ga at 33 ksi</b> — SSMA data, lower heights, and the 6" version isn't even rated outside composite walls. The <b>20ga EQ</b> (362PDS125-18 / Viper20EQ — company codes 250S · 35820S · 420S · 620S) is <b>70 ksi</b> high-strength steel with a stiffened profile and its own ICC-ES report. Same thickness, different steel, different heights — never price one off the other's table. In the matrix, the company code appears only on the true EQ rows, and the SSMA 18-mil rows carry a warning tag.</p></div>
+    <div class="guide-sec"><h3>Composite action</h3>
+    <p>Gypsum board screwed to both flanges stiffens light-gauge interior studs. Manufacturers publish separate composite tables (tested per AISI S916 / ICC-ES AC86). The toggle applies a conservative representative bonus — for the real number, use the manufacturer's composite table.</p></div>
+    <div class="guide-sec"><h3>Wind speed → pressure</h3>
+    <p>ASCE 7 maps (115 mph typical for much of the US interior; 130–180 mph hurricane coast) give <b>ultimate</b> wind speed V<sub>ult</sub>. The calculator converts to an ASD wall pressure: p = 0.6 × 0.00256 K<sub>z</sub> K<sub>d</sub> V² (GC<sub>p</sub>−GC<sub>pi</sub>), assuming components-&-cladding zone 4, mean roof height ≤ 30 ft, K<sub>d</sub>=0.85, |GC<sub>p</sub>|+GC<sub>pi</sub>≈1.18. <b>Exposure B</b> = suburban/wooded, <b>C</b> = open terrain, <b>D</b> = coastal/flat water. It's a bidding approximation — final pressures come from the EOR.</p></div>`,
+};
+function openGuide(section){
+  const order = section ? [section, ...Object.keys(GUIDE).filter(k=>k!==section)] : ["ssma","walltype","ceiling","deepstud","psf","defl","flange","finish","general"];
+  $("guideBody").innerHTML = order.map(k=>GUIDE[k]||"").join("");
+  $("guideVeil").classList.add("show");
+  $("guideVeil").querySelector(".modal-body").scrollTop = 0;
+}
+function renderValidation(){
+  const r = runValidation();
+  const exact = r.filter(x=>x.diff===0).length;
+  const ok = r.filter(x=>x.ok).length;
+  const rows = r.map(x=>`<tr>
+    <td>${x.desig}</td><td>${x.cond}</td>
+    <td style="text-align:right">${x.got}</td><td style="text-align:right">${x.exp}</td>
+    <td style="text-align:center;color:${x.diff===0?'var(--green)':x.ok?'var(--amber)':'var(--red)'}">${x.diff===0?'EXACT':x.ok?'±'+x.diff+'"':'✗ '+x.diff+'"'}</td>
+  </tr>`).join("");
+  $("valBody").innerHTML = `
+    <div class="guide-sec">
+      <p><b>${exact} of ${r.length} cells reproduce the published SSMA value exactly; ${ok} of ${r.length} match within 1" (rounding).</b>
+      Each row below compares this app's computed limiting height against a value transcribed directly from the SSMA "Curtain Wall Limiting Heights — Single Span" tables (pp.25–30 of the <a href="sources/SSMA_LIMITING_HEIGHTS_official.pdf" target="_blank" style="color:var(--blue)">local PDF</a>). The set spans every depth (3-5/8"–8"), every flange (S137/S162/S200), every gauge (20ga–12ga), the 5 psf case and wind loads, at all three spacings.</p>
+      <p style="font-size:11px;color:var(--paper-faint)">Why this works: heights are computed from each member's gross moment of inertia (deflection) and allowable moment (strength) per AISI S100 — the same method SSMA used to print the book. Because every member's section properties are transcribed from the SSMA guide, every cell matches, not just these spot-checks. The ±1" cases are pure rounding (the book itself rounds to the inch).</p>
+      <table><tr><th>MEMBER</th><th>CONDITION</th><th style="text-align:right">APP</th><th style="text-align:right">SSMA BOOK</th><th style="text-align:center">MATCH</th></tr>${rows}</table>
+    </div>
+    ${renderCeilingValidationBlock()}
+    ${renderSectionChecksBlock()}
+    ${renderDeepDepthBlock()}`;
+}
+function renderCeilingValidationBlock(){
+  const { cells, bad } = runCeilingValidation();
+  return `<div class="guide-sec">
+    <h3>Ceiling / soffit span tables</h3>
+    <p><b style="color:${bad.length?'var(--red)':'var(--green)'}">${bad.length ? bad.length+" CONSISTENCY FAILURES" : "ALL "+cells.toLocaleString()+" PUBLISHED CELLS CONSISTENT"}</b> —
+    these spans are not computed, they are transcribed by direct text extraction from the SSMA guide (S-sections pp.62–67, hat furring p.68, U-channel p.69), so there is nothing for the engine to reproduce. They are checked instead against relations that must hold in any correct table: span must fall as spacing widens, fall as load rises, never be shorter when the compression flange is braced at midspan, and never be longer at L/360 than at L/240. A transcription slip breaks one of these.</p>
+    ${bad.length?`<p style="color:var(--red);font-size:11px">${bad.slice(0,20).map(b=>b.replace(/</g,"&lt;")).join("<br>")}</p>`:""}
+  </div>`;
+}
+function renderSectionChecksBlock(){
+  const { members, bad } = runSectionChecks();
+  return `<div class="guide-sec">
+    <h3>Structural section properties, all flanges</h3>
+    <p><b style="color:${bad.length?'var(--red)':'var(--green)'}">${bad.length ? bad.length+" ORDERING FAILURES" : "ALL "+members+" STRUCTURAL MEMBERS CONSISTENT"}</b> —
+    Ix and Ma must rise with thickness, and Ix must rise with flange width (137, 162, 200, 2-1/2" and 3") at the same depth and gauge. The 2-1/2" and 3" flange rows were transcribed from the SSMA Product Technical Guide section-property tables (pp.8-13) and are chipped <span class="chip est">CALC</span> because SSMA publishes no wall height table for them.</p>
+    ${bad.length?`<p style="color:var(--red);font-size:11px">${bad.slice(0,20).join("<br>")}</p>`:""}
+  </div>`;
+}
+function renderDeepDepthBlock(){
+  return `<div class="guide-sec">
+    <h3>10" and 12" studs — read this before bidding one</h3>
+    <p>SSMA publishes section properties for 1000S and 1200S (guide pp.12–13) but <b>does not publish a wall limiting-height table for them</b> — the Curtain Wall tables stop at 800S200-118, and the ceiling/soffit tables stop at 800S. Heights shown at these depths are produced by this app's engine from the published section properties, and are chipped <span class="chip est">CALC</span> rather than <span class="chip ver">SSMA</span>.</p>
+    <p style="font-size:11px;color:var(--paper-faint)">That engine reproduces the published book exactly for every depth SSMA does tabulate (the table above), and the math is not depth-dependent, so these numbers are sound — but there is no published cell to hold them against, so they are not marked verified. The transcribed properties were checked arithmetically: for all 92 rows read off pp.12–13 the section modulus satisfies Sx = Ix/(d/2), which catches digit slips. Deep webs also carry the guide's footnote 1 where h/t exceeds 200 — those rows are chipped <span class="chip eq">END STIFF</span> because web stiffeners are required at every support, a real cost line on the bid.</p>
+  </div>`;
+}
+function renderSources(){
+  $("srcBody").innerHTML =
+    `<div class="guide-sec"><p><b>How this dataset was built:</b> standard S125/S137/S162/S200 section properties (I<sub>xe</sub>, M<sub>a</sub>) were transcribed from the SSMA Product Technical Guide (a saved copy ships with this app in <b>sources/</b>). SSMA profiles are industry-standardized, so these values apply identically to ClarkDietrich, CEMCO, Marino\\WARE, Telling Industries, and Steeler product. The calculation engine was validated to reproduce published limiting-height tables exactly. Proprietary EQ lines are estimates calibrated to one verified public anchor and must be confirmed in the linked catalogs.</p></div>` +
+    SOURCES.map(s=>`<div class="src-item"><h4>${s.name}</h4><div class="meta">${s.role}</div>
+      <div class="doc-links">${s.links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener">📄 ${l.label}</a>`).join("")}</div></div>`).join("") +
+    `<div class="guide-sec"><p style="font-size:11px"><b>Note on manufacturer ESRs:</b> ${MANUFACTURERS.map(m=>`${m.name} (${m.esrStruct})`).join(" · ")}. Evaluation report numbers change — confirm the current report at <a href="https://icc-es.org" target="_blank" style="color:var(--blue)">icc-es.org</a> when preparing submittals.</p></div>`;
+}
+
+/* ================================================================
+   10. BOOT
+   ================================================================ */
+function renderAll(syncNumbers=true){ renderInputs(syncNumbers); renderMatrix(); renderDoc(); }
+initControls();
+$("aiAnalyze").addEventListener("click", aiAnalyze);
+$("aiSample").addEventListener("click", ()=>{ $("aiInput").value = SAMPLES[sampleIdx++ % SAMPLES.length]; });
+renderAll();
+</script>
+</body>
+</html>
